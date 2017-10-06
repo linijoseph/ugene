@@ -32,6 +32,7 @@
 #include <QToolTip>
 
 #include <U2Core/AppContext.h>
+#include <U2Core/Counter.h>
 #include <U2Core/MultipleSequenceAlignmentObject.h>
 #include <U2Core/Settings.h>
 #include <U2Core/U2SafePoints.h>
@@ -300,6 +301,13 @@ void MaEditorConsensusArea::sl_changeConsensusAlgorithm(const QString& algoId) {
     if (getConsensusAlgorithm()->getFactory() != algoFactory) {
         assert(algoFactory!=NULL);
         setConsensusAlgorithm(algoFactory);
+        if (editor->getSettingsRoot() == MCAE_SETTINGS_ROOT) {
+            if (algoId == BuiltInConsensusAlgorithms::SIMPLE_EXTENDED_ALGO) {
+                GCOUNTER(cvar, tvar, "\"Simple extended\" consensus type is selected");
+            } else if (algoId == BuiltInConsensusAlgorithms::STRICT_ALGO) {
+                GCOUNTER(cvar, tvar, "\"Strict\" consensus type is selected");
+            }
+        }
     }
     emit si_consensusAlgorithmChanged(algoId);
 }

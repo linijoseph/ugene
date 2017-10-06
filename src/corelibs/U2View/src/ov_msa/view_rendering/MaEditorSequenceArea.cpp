@@ -29,6 +29,7 @@
 
 #include <U2Core/AppContext.h>
 #include <U2Core/BaseDocumentFormats.h>
+#include <U2Core/Counter.h>
 #include <U2Core/DNAAlphabet.h>
 #include <U2Core/L10n.h>
 #include <U2Core/MultipleAlignmentObject.h>
@@ -648,17 +649,29 @@ void MaEditorSequenceArea::sl_changeColorScheme() {
 }
 
 void MaEditorSequenceArea::sl_delCurrentSelection() {
+    if (editor->getSettingsRoot() == MCAE_SETTINGS_ROOT) {
+        GCOUNTER(cvar, tvar, "Remove character");
+    }
+    if (editor->getSettingsRoot() == MCAE_SETTINGS_ROOT) {
+        GCOUNTER(cvar, tvar, "Remove gap using \"Remove character / gap\"");
+    }
     emit si_startMaChanging();
     deleteCurrentSelection();
     emit si_stopMaChanging(true);
 }
 
 void MaEditorSequenceArea::sl_cancelSelection() {
+    if (editor->getSettingsRoot() == MCAE_SETTINGS_ROOT) {
+        GCOUNTER(cvar, tvar, "Clear selection");
+    }
     MaEditorSelection emptySelection;
     setSelection(emptySelection);
 }
 
 void MaEditorSequenceArea::sl_fillCurrentSelectionWithGaps() {
+    if (editor->getSettingsRoot() == MCAE_SETTINGS_ROOT) {
+        GCOUNTER(cvar, tvar, "Insert gap");
+    }
     if(!isAlignmentLocked()) {
         emit si_startMaChanging();
         insertGapsBeforeSelection();
@@ -796,6 +809,9 @@ void MaEditorSequenceArea::sl_changeHighlightScheme(){
 }
 
 void MaEditorSequenceArea::sl_replaceSelectedCharacter() {
+    if (editor->getSettingsRoot() == MCAE_SETTINGS_ROOT) {
+        GCOUNTER(cvar, tvar, "Replace character");
+    }
     maMode = ReplaceCharMode;
     editModeAnimationTimer.start(500);
     highlightCurrentSelection();

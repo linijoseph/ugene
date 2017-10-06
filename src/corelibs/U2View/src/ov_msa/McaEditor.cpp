@@ -22,6 +22,7 @@
 #include <QToolBar>
 
 #include <U2Core/AppContext.h>
+#include <U2Core/Counter.h>
 #include <U2Core/DNASequenceObject.h>
 #include <U2Core/Settings.h>
 #include <U2Core/U2OpStatusUtils.h>
@@ -50,6 +51,7 @@ McaEditor::McaEditor(const QString &viewName,
     : MaEditor(McaEditorFactory::ID, viewName, obj),
       referenceCtx(NULL)
 {
+    GCOUNTER(cvar, tvar, "Sanger Reads Editor");
     initZoom();
     initFont();
 
@@ -140,6 +142,9 @@ void McaEditor::sl_onContextMenuRequested(const QPoint & /*pos*/) {
 }
 
 void McaEditor::sl_showHideChromatograms(bool show) {
+    if (getSettingsRoot() == MCAE_SETTINGS_ROOT) {
+        GCOUNTER(cvar, tvar, "Selection of the "Show chromatogram" item");
+    }
     ui->getCollapseModel()->collapseAll(!show);
     sl_saveChromatogramState();
     emit si_completeUpdate();
@@ -236,6 +241,9 @@ void McaEditor::initActions() {
 void McaEditor::sl_saveOverviewState() {
     Settings* s = AppContext::getSettings();
     SAFE_POINT(s != NULL, "AppContext::settings is NULL", );
+    if (getSettingsRoot() == MCAE_SETTINGS_ROOT) {
+        GCOUNTER(cvar, tvar, "\"Show overview\" is checked");
+    }
     s->setValue(getSettingsRoot() + MCAE_SETTINGS_SHOW_OVERVIEW, showOverviewAction->isChecked());
 }
 

@@ -20,16 +20,20 @@
  */
 
 #include "MaConsensusModeWidget.h"
+#include "../view_rendering/MaEditorWgt.h"
+#include "../MaEditor.h"
 
 #include <U2Algorithm/MSAConsensusAlgorithmRegistry.h>
 
 #include <U2Core/AppContext.h>
+#include <U2Core/Counter.h>
 #include <U2Core/DNAAlphabet.h>
 #include <U2Core/U2SafePoints.h>
 
 #include <U2Core/MultipleAlignmentObject.h>
 #include <U2Core/MultipleChromatogramAlignmentObject.h>
 #include <U2View/MSAEditorConsensusArea.h>
+
 
 namespace U2 {
 
@@ -99,6 +103,9 @@ void MaConsensusModeWidget::updateThresholdState(bool enable, int minVal, int ma
 }
 
 void MaConsensusModeWidget::sl_algorithmChanged(const QString& algoId) {
+    if (consArea->getEditorWgt()->getEditor()->getSettingsRoot() == MCAE_SETTINGS_ROOT) {
+        GCOUNTER(cvar, tvar, "Modification of the consensus type or threshold");
+    }
     // Update state for the current algorithm
     SAFE_POINT(maObject != NULL, "MaConsensusModeWidget is not initialized", );
 
@@ -122,6 +129,9 @@ void MaConsensusModeWidget::sl_algorithmSelectionChanged(int index) {
 }
 
 void MaConsensusModeWidget::sl_thresholdSliderChanged(int value) {
+    if (consArea->getEditorWgt()->getEditor()->getSettingsRoot() == MCAE_SETTINGS_ROOT) {
+        GCOUNTER(cvar, tvar, "Modification of the consensus type or threshold");
+    }
     thresholdSpinBox->disconnect(this);
     thresholdSpinBox->setValue(value);
     connect(thresholdSpinBox, SIGNAL(valueChanged(int)), SLOT(sl_thresholdSpinBoxChanged(int)));

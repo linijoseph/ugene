@@ -22,6 +22,7 @@
 #include <QBitArray>
 
 #include <U2Core/AppContext.h>
+#include <U2Core/Counter.h>
 #include <U2Core/MultipleAlignmentObject.h>
 #include <U2Core/U2SafePoints.h>
 
@@ -74,10 +75,12 @@ QAction *MaAmbiguousCharactersController::getNextAction() const {
 }
 
 void MaAmbiguousCharactersController::sl_next() {
+    GCOUNTER(cvar, tvar, "Jump to next ambiguous character");
     scrollToNextAmbiguous(Forward);
 }
 
 void MaAmbiguousCharactersController::sl_previous() {
+    GCOUNTER(cvar, tvar, "Jump to previous ambiguous character");
     scrollToNextAmbiguous(Backward);
 }
 

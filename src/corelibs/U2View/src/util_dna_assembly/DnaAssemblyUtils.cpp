@@ -31,6 +31,7 @@
 #include <U2Core/AddDocumentTask.h>
 #include <U2Core/AppContext.h>
 #include <U2Core/AppSettings.h>
+#include <U2Core/Counter.h>
 #include <U2Core/UserApplicationsSettings.h>
 #include <U2Core/BaseDocumentFormats.h>
 #include <U2Core/DNASequenceObject.h>
@@ -91,6 +92,7 @@ DnaAssemblySupport::DnaAssemblySupport()
 
 void DnaAssemblySupport::sl_showDnaAssemblyDialog()
 {
+    GCOUNTER(cvar, tvar, "Selection of the menu item \"Tools > Sanger data analysis > Map reads to reference\"");
     DnaAssemblyAlgRegistry* registry = AppContext::getDnaAssemblyAlgRegistry();
     if (registry->getRegisteredAlgorithmIds().isEmpty()) {
         QMessageBox::information(QApplication::activeWindow(), tr("DNA Assembly"),
@@ -341,6 +343,7 @@ const DnaAssemblyToRefTaskSettings& DnaAssemblyTaskWithConversions::getSettings(
     return settings;
 }
 void DnaAssemblyTaskWithConversions::prepare() {
+    GCOUNTER(cvar, tvar, "The number of the Sanger reads mapping task launches");
     DnaAssemblyAlgorithmEnv *env= AppContext::getDnaAssemblyAlgRegistry()->getAlgorithm(settings.algName);
     if (env == NULL) {
         setError(QString("Algorithm %1 is not found").arg(settings.algName));

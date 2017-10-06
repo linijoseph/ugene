@@ -22,6 +22,7 @@
 #include <QMainWindow>
 
 #include <U2Core/AppContext.h>
+#include <U2Core/Counter.h>
 #include <U2Core/DocumentUtils.h>
 #include <U2Core/GUrlUtils.h>
 #include <U2Core/IOAdapter.h>
@@ -80,6 +81,7 @@ QString ExportUtils::genUniqueName(const QSet<QString>& names, QString prefix) {
 
 void ExportUtils::launchExportMca2MsaTask(MultipleChromatogramAlignmentObject *mcaObject) {
     SAFE_POINT(NULL != mcaObject, "Can't cast the object to MultipleChromatogramAlignmentObject", );
+    GCOUNTER(cvar, tvar, "The number of the \"Export Alignment without Chromatograms\" dialog openings");
 
     Document *document = mcaObject->getDocument();
     QString defaultUrl = GUrlUtils::getNewLocalUrlByFormat(document->getURL(), mcaObject->getGObjectName(), BaseDocumentFormats::UGENEDB, "");

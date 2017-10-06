@@ -19,6 +19,7 @@
  * MA 02110-1301, USA.
  */
 
+#include <U2core/Counter.h>
 #include <U2Core/GHints.h>
 #include <U2Core/L10n.h>
 #include <U2Core/MultipleSequenceAlignmentExporter.h>
@@ -45,6 +46,7 @@ ExportMca2MsaTask::ExportMca2MsaTask(MultipleChromatogramAlignmentObject *mcaObj
 }
 
 void ExportMca2MsaTask::prepare() {
+    GCOUNTER(cvar, tvar, "The number of the \"Export Alignment without Chromatograms\" task launches");
     convertTask = new ConvertMca2MsaTask(mcaObject, includeReference);
     addSubTask(convertTask);
 }

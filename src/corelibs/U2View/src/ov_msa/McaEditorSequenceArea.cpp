@@ -25,6 +25,7 @@
 #include <U2Algorithm/MsaHighlightingScheme.h>
 
 #include <U2Core/AppContext.h>
+#include <U2Core/Counter.h>
 #include <U2Core/DNAAlphabet.h>
 #include <U2Core/DNASequenceObject.h>
 #include <U2Core/DNASequenceUtils.h>
@@ -234,6 +235,7 @@ void McaEditorSequenceArea::sl_backgroundSelectionChanged() {
 }
 
 void McaEditorSequenceArea::sl_showHideTrace() {
+    GCOUNTER(cvar, tvar, "Selection of a \"Show / hide trace\" item");
     QAction* traceAction = qobject_cast<QAction*> (sender());
 
     if (!traceAction) {
@@ -270,6 +272,11 @@ void McaEditorSequenceArea::sl_showAllTraces() {
 void McaEditorSequenceArea::sl_setRenderAreaHeight(int k) {
     //k = chromaMax
     SequenceWithChromatogramAreaRenderer* r = qobject_cast<SequenceWithChromatogramAreaRenderer*>(renderer);
+    if (r->getAreaHeight() > k) {
+        GCOUNTER(cvar, tvar, "Increase peaks height");
+    } else {
+        GCOUNTER(cvar, tvar, "Decrease peaks height");
+    }
     r->setAreaHeight(k);
     sl_completeUpdate();
 }
@@ -293,6 +300,7 @@ void McaEditorSequenceArea::sl_buildStaticToolbar(GObjectView *v, QToolBar *t) {
 }
 
 void McaEditorSequenceArea::sl_addInsertion() {
+    GCOUNTER(cvar, tvar, "Insert gap using \"Insert character / gap\"");
     maMode = InsertCharMode;
     editModeAnimationTimer.start(500);
     highlightCurrentSelection();
@@ -300,12 +308,14 @@ void McaEditorSequenceArea::sl_addInsertion() {
 }
 
 void McaEditorSequenceArea::sl_removeGapBeforeSelection() {
+    GCOUNTER(cvar, tvar, "Remove gap at the left");
     emit si_startMaChanging();
     removeGapsPrecedingSelection(1);
     emit si_stopMaChanging(true);
 }
 
 void McaEditorSequenceArea::sl_removeColumnsOfGaps() {
+    GCOUNTER(cvar, tvar, "Remove all columns of gaps");
     U2OpStatus2Log os;
     U2UseCommonUserModStep userModStep(editor->getMaObject()->getEntityRef(), os);
     Q_UNUSED(userModStep);
@@ -314,10 +324,12 @@ void McaEditorSequenceArea::sl_removeColumnsOfGaps() {
 }
 
 void McaEditorSequenceArea::sl_trimLeftEnd() {
+    GCOUNTER(cvar, tvar, "Trim left end");
     trimRowEnd(MultipleChromatogramAlignmentObject::Left);
 }
 
 void McaEditorSequenceArea::sl_trimRightEnd() {
+    GCOUNTER(cvar, tvar, "Trim right end");
     trimRowEnd(MultipleChromatogramAlignmentObject::Right);
 }
 

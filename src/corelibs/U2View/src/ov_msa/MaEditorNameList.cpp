@@ -25,6 +25,7 @@
 #include <QMouseEvent>
 #include <QPainter>
 
+#include <U2Core/Counter.h>
 #include <U2Core/U2Mod.h>
 #include <U2Core/U2OpStatusUtils.h>
 #include <U2Core/U2SafePoints.h>
@@ -245,6 +246,9 @@ void MaEditorNameList::sl_alignmentChanged(const MultipleAlignment&, const MaMod
 }
 
 void MaEditorNameList::sl_removeSequence() {
+    if (editor->getSettingsRoot() == MCAE_SETTINGS_ROOT) {
+        GCOUNTER(cvar, tvar, "Remove read");
+    }
     U2Region sel = getSelection();
     CHECK(!sel.isEmpty(), );
 
@@ -822,6 +826,9 @@ void MaEditorNameList::drawSelection(QPainter &painter) {
 }
 
 void MaEditorNameList::sl_editSequenceName() {
+    if (editor->getSettingsRoot() == MCAE_SETTINGS_ROOT) {
+        GCOUNTER(cvar, tvar, "Rename read");
+    }
     MultipleAlignmentObject* maObj = editor->getMaObject();
     CHECK(!maObj->isStateLocked(), );
 
