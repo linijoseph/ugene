@@ -21,6 +21,7 @@
 
 #include <U2Core/AppContext.h>
 #include <U2Core/AssemblyObject.h>
+#include <U2Core/Counter.h>
 #include <U2Core/DNASequenceObject.h>
 #include <U2Core/GObjectUtils.h>
 #include <U2Core/IOAdapter.h>
@@ -116,6 +117,10 @@ QList<GObject *> DbiDocumentFormat::prepareObjects(DbiConnection &handle, const 
         U2Object object;
         handle.dbi->getObjectDbi()->getObject(object, id, status);
         CHECK_OPERATION(!status.isCoR(), continue);
+
+        if (object.getType() == U2Type::Mca) {
+            GCOUNTER(cvar, tvar, "The number of opening of the ugenedb files with Sanger data");
+        }
 
         if (object.visualName.isEmpty()) {
             object.visualName = "Unnamed object";

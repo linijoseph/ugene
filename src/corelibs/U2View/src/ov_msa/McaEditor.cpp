@@ -143,7 +143,7 @@ void McaEditor::sl_onContextMenuRequested(const QPoint & /*pos*/) {
 
 void McaEditor::sl_showHideChromatograms(bool show) {
     if (getSettingsRoot() == MCAE_SETTINGS_ROOT) {
-        GCOUNTER(cvar, tvar, "Selection of the "Show chromatogram" item");
+        GCOUNTER(cvar, tvar, "Selection of the \"Show chromatogram\" item");
     }
     ui->getCollapseModel()->collapseAll(!show);
     sl_saveChromatogramState();
@@ -236,6 +236,9 @@ void McaEditor::initActions() {
     showOverviewAction->setChecked(overviewVisible);
     ui->getOverviewArea()->setVisible(overviewVisible);
     changeFontAction->setText(tr("Change characters font..."));
+    if (overviewVisible) {
+        GCOUNTER(cvar, tvar, "\"Show overview\" is checked");
+    }
 }
 
 void McaEditor::sl_saveOverviewState() {

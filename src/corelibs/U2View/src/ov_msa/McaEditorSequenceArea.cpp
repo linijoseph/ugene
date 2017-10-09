@@ -300,7 +300,6 @@ void McaEditorSequenceArea::sl_buildStaticToolbar(GObjectView *v, QToolBar *t) {
 }
 
 void McaEditorSequenceArea::sl_addInsertion() {
-    GCOUNTER(cvar, tvar, "Insert gap using \"Insert character / gap\"");
     maMode = InsertCharMode;
     editModeAnimationTimer.start(500);
     highlightCurrentSelection();
@@ -439,6 +438,12 @@ void McaEditorSequenceArea::insertChar(char newCharacter) {
     int xSelection = selection.x();
     maObj->changeLength(os, maObj->getLength() + 1);
     maObj->insertCharacter(selection.y(), xSelection, newCharacter);
+
+    if (newCharacter == U2Msa::GAP_CHAR) {
+        GCOUNTER(cvar, tvar, "Insert gap using \"Insert character / gap\"");
+    } else {
+        GCOUNTER(cvar, tvar, "Insert character");
+    }
 
     // insert char into the reference
     U2SequenceObject* ref = getEditor()->getMaObject()->getReferenceObj();

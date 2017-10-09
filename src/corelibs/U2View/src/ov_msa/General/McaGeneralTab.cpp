@@ -18,10 +18,12 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301, USA.
  */
+#include <QShowEvent>
 
 #include "McaGeneralTab.h"
-
 #include "../McaEditor.h"
+
+#include <U2Core/Counter.h>
 #include <U2Gui/ShowHideSubgroupWidget.h>
 
 namespace U2 {
@@ -46,6 +48,12 @@ McaGeneralTab::McaGeneralTab(McaEditor *mca)
 void McaGeneralTab::sl_alignmentChanged() {
     lengthLabel->setText(QString::number(mca->getAlignmentLen()));
     seqNumLabel->setText(QString::number(mca->getNumSequences()));
+}
+
+void McaGeneralTab::showEvent(QShowEvent *e) {
+    if (!e->spontaneous()) {
+        GCOUNTER(cvar, tvar, "Opening of the \"General\" tab");
+    }
 }
 
 } // namespace

@@ -60,6 +60,8 @@ protected:
 
 private slots:
     void sl_alignmentChanged();
+    void sl_countUndo();
+    void sl_countRedo();
 
 private:
     McaEditorReferenceArea*     refArea;

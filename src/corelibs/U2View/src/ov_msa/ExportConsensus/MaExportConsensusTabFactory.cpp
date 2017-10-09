@@ -20,7 +20,9 @@
  */
 
 #include <QPixmap>
+#include <QShowEvent>
 
+#include <U2Core/Counter.h>
 #include <U2Core/U2SafePoints.h>
 
 #include <U2Gui/ShowHideSubgroupWidget.h>
@@ -104,5 +106,11 @@ const QString &McaExportConsensusTabFactory::getGroupId() {
     return GROUP_ID;
 }
 
+
+void McaExportConsensusTabFactory::showEvent(QShowEvent *e) {
+    if (!e->spontaneous()) {
+        GCOUNTER(cvar, tvar, "Opening of the \"Consensus\" tab");
+    }
+}
 
 } // namespace U2

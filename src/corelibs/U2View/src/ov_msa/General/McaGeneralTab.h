@@ -38,6 +38,9 @@ public:
 public slots:
     void sl_alignmentChanged();
 
+protected:
+    void showEvent(QShowEvent *e);
+
 private:
     McaEditor* mca;
 };

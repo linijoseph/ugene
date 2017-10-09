@@ -377,6 +377,14 @@ void MaEditorSequenceArea::deleteCurrentSelection() {
             return;
         }
     }
+    if (editor->getSettingsRoot() == MCAE_SETTINGS_ROOT) {
+        if (maObj->getRow(selection.topLeft().y())->charAt(selection.topLeft().x()) == U2Msa::GAP_CHAR) {
+                GCOUNTER(cvar, tvar, "Remove gap using \"Remove character / gap\"");
+            } else {
+                GCOUNTER(cvar, tvar, "Remove character");
+                
+            }
+    }
     sl_cancelSelection();
 }
 
@@ -649,12 +657,6 @@ void MaEditorSequenceArea::sl_changeColorScheme() {
 }
 
 void MaEditorSequenceArea::sl_delCurrentSelection() {
-    if (editor->getSettingsRoot() == MCAE_SETTINGS_ROOT) {
-        GCOUNTER(cvar, tvar, "Remove character");
-    }
-    if (editor->getSettingsRoot() == MCAE_SETTINGS_ROOT) {
-        GCOUNTER(cvar, tvar, "Remove gap using \"Remove character / gap\"");
-    }
     emit si_startMaChanging();
     deleteCurrentSelection();
     emit si_stopMaChanging(true);
@@ -1543,6 +1545,14 @@ void MaEditorSequenceArea::replaceChar(char newCharacter) {
     if (maObj->getNumRows() == 1 && maObj->getRow(selection.y())->getCoreLength() == 1 && newCharacter == U2Msa::GAP_CHAR) {
         exitFromEditCharacterMode();
         return;
+    }
+
+    if (editor->getSettingsRoot() == MCAE_SETTINGS_ROOT) {
+        if (newCharacter == U2Msa::GAP_CHAR) {
+            GCOUNTER(cvar, tvar, "Replace gap");
+        } else {
+            GCOUNTER(cvar, tvar, "Replace character");
+        }
     }
 
     U2OpStatusImpl os;
