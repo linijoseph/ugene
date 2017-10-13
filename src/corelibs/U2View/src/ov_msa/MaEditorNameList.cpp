@@ -246,9 +246,7 @@ void MaEditorNameList::sl_alignmentChanged(const MultipleAlignment&, const MaMod
 }
 
 void MaEditorNameList::sl_removeSequence() {
-    if (editor->getSettingsRoot() == MCAE_SETTINGS_ROOT) {
-        GCOUNTER(cvar, tvar, "Remove read");
-    }
+    GRUNTIME_NAMED_COUNTER(cvat, tvar, "Remove read", editor->getFactoryId());
     U2Region sel = getSelection();
     CHECK(!sel.isEmpty(), );
 
@@ -826,9 +824,7 @@ void MaEditorNameList::drawSelection(QPainter &painter) {
 }
 
 void MaEditorNameList::sl_editSequenceName() {
-    if (editor->getSettingsRoot() == MCAE_SETTINGS_ROOT) {
-        GCOUNTER(cvar, tvar, "Rename read");
-    }
+    GRUNTIME_NAMED_COUNTER(cvat, tvar, "Rename read", editor->getFactoryId());
     MultipleAlignmentObject* maObj = editor->getMaObject();
     CHECK(!maObj->isStateLocked(), );
 

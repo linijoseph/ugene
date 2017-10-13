@@ -50,10 +50,4 @@ void McaGeneralTab::sl_alignmentChanged() {
     seqNumLabel->setText(QString::number(mca->getNumSequences()));
 }
 
-void McaGeneralTab::showEvent(QShowEvent *e) {
-    if (!e->spontaneous()) {
-        GCOUNTER(cvar, tvar, "Opening of the \"General\" tab");
-    }
-}
-
 } // namespace

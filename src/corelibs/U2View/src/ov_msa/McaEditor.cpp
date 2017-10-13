@@ -142,9 +142,7 @@ void McaEditor::sl_onContextMenuRequested(const QPoint & /*pos*/) {
 }
 
 void McaEditor::sl_showHideChromatograms(bool show) {
-    if (getSettingsRoot() == MCAE_SETTINGS_ROOT) {
-        GCOUNTER(cvar, tvar, "Selection of the \"Show chromatogram\" item");
-    }
+    GRUNTIME_NAMED_COUNTER(cvat, tvar, "'Show chromatogram' action triggered", getFactoryId());
     ui->getCollapseModel()->collapseAll(!show);
     sl_saveChromatogramState();
     emit si_completeUpdate();
@@ -244,9 +242,7 @@ void McaEditor::initActions() {
 void McaEditor::sl_saveOverviewState() {
     Settings* s = AppContext::getSettings();
     SAFE_POINT(s != NULL, "AppContext::settings is NULL", );
-    if (getSettingsRoot() == MCAE_SETTINGS_ROOT) {
-        GCOUNTER(cvar, tvar, "\"Show overview\" is checked");
-    }
+    GRUNTIME_NAMED_COUNTER(cvat, tvar, "'Show overview' action triggered", getFactoryId());
     s->setValue(getSettingsRoot() + MCAE_SETTINGS_SHOW_OVERVIEW, showOverviewAction->isChecked());
 }
 

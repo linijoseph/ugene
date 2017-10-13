@@ -75,9 +75,7 @@ MaExportConsensusWidget::MaExportConsensusWidget(MaEditor* ma_, QWidget *parent)
 }
 
 void MaExportConsensusWidget::sl_exportClicked(){
-    if (ma->getSettingsRoot() == MCAE_SETTINGS_ROOT) {
-        GCOUNTER(cvar, tvar, "Exporting of consensus");
-    }
+    GRUNTIME_NAMED_COUNTER(cvat, tvar, "Exporting of consensus", ma->getFactoryId());
     if (saveController->getSaveFileName().isEmpty()) {
         saveController->setPath(getDefaultFilePath());
     }

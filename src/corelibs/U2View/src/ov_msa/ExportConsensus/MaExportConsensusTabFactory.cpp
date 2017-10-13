@@ -106,11 +106,4 @@ const QString &McaExportConsensusTabFactory::getGroupId() {
     return GROUP_ID;
 }
 
-
-void McaExportConsensusTabFactory::showEvent(QShowEvent *e) {
-    if (!e->spontaneous()) {
-        GCOUNTER(cvar, tvar, "Opening of the \"Consensus\" tab");
-    }
-}
-
 } // namespace U2

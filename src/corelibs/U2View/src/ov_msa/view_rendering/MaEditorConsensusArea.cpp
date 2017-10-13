@@ -147,13 +147,7 @@ bool MaEditorConsensusArea::event(QEvent* e) {
 
 void MaEditorConsensusArea::initCache() {
     MSAConsensusAlgorithmFactory *algo = getConsensusAlgorithmFactory();
-    if (editor->getSettingsRoot() == MCAE_SETTINGS_ROOT) {
-        if (algo->getId() == BuiltInConsensusAlgorithms::STRICT_ALGO) {
-            GCOUNTER(cvar, tvar, "\"Strict\" consensus type is selected");
-        } else if (algo->getId() == BuiltInConsensusAlgorithms::SIMPLE_EXTENDED_ALGO) {
-            GCOUNTER(cvar, tvar, "\"Simple extended\" consensus type is selected");
-        }
-    }
+    GRUNTIME_NAMED_COUNTER(cvar, tvar, algo->getName() + " consensus type is selected", editor->getFactoryId());
     consensusCache = QSharedPointer<MSAEditorConsensusCache>(new MSAEditorConsensusCache(NULL, editor->getMaObject(), algo));
     connect(consensusCache->getConsensusAlgorithm(), SIGNAL(si_thresholdChanged(int)), SLOT(sl_onConsensusThresholdChanged(int)));
     restoreLastUsedConsensusThreshold();
@@ -308,13 +302,7 @@ void MaEditorConsensusArea::sl_changeConsensusAlgorithm(const QString& algoId) {
     if (getConsensusAlgorithm()->getFactory() != algoFactory) {
         assert(algoFactory!=NULL);
         setConsensusAlgorithm(algoFactory);
-        if (editor->getSettingsRoot() == MCAE_SETTINGS_ROOT) {
-            if (algoId == BuiltInConsensusAlgorithms::SIMPLE_EXTENDED_ALGO) {
-                GCOUNTER(cvar, tvar, "\"Simple extended\" consensus type is selected");
-            } else if (algoId == BuiltInConsensusAlgorithms::STRICT_ALGO) {
-                GCOUNTER(cvar, tvar, "\"Strict\" consensus type is selected");
-            }
-        }
+        GRUNTIME_NAMED_COUNTER(cvar, tvar, algoFactory->getName() + " consensus type is selected", editor->getFactoryId());
     }
     emit si_consensusAlgorithmChanged(algoId);
 }

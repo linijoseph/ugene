@@ -20,6 +20,7 @@
  */
 
 #include <U2Core/AppContext.h>
+#include <U2Core/Counter.h>
 #include <U2Core/U2SafePoints.h>
 
 #include <U2Gui/OPWidgetFactory.h>
@@ -83,6 +84,7 @@ void OptionsPanel::sl_groupHeaderPressed(QString groupId) {
 
     // Implement the logic of the groups opening/closing
     if (OPMainWidgetState_Closed == widget->getState()) {
+        GRUNTIME_NAMED_COUNTER(cvat, tvar, "Opening tab: ", groupId);
         widget->openOptionsPanel();
         openOptionsGroup(groupId);
         return;
@@ -94,6 +96,7 @@ void OptionsPanel::sl_groupHeaderPressed(QString groupId) {
         closeOptionsGroup(groupId);
         return;
     } else { // Another group has been selected
+        GRUNTIME_NAMED_COUNTER(cvat, tvar, "Opening tab: ", groupId);
         closeOptionsGroup(activeGroupId);
         openOptionsGroup(groupId);
     }

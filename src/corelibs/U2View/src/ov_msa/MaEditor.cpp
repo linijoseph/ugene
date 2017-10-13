@@ -190,9 +190,7 @@ void MaEditor::resetCollapsibleModel() {
 }
 
 void MaEditor::sl_zoomIn() {
-    if (getSettingsRoot() == MCAE_SETTINGS_ROOT) {
-        GCOUNTER(cvar, tvar, "Zoom in");
-    }
+    GRUNTIME_NAMED_COUNTER(cvat, tvar, "Zoom in", getFactoryId());
     int pSize = font.pointSize();
 
     if (resizeMode == ResizeMode_OnlyContent) {
@@ -216,9 +214,7 @@ void MaEditor::sl_zoomIn() {
 }
 
 void MaEditor::sl_zoomOut() {
-    if (getSettingsRoot() == MCAE_SETTINGS_ROOT) {
-        GCOUNTER(cvar, tvar, "Zoom out");
-    }
+    GRUNTIME_NAMED_COUNTER(cvat, tvar, "Zoom out", getFactoryId());
     int pSize = font.pointSize();
 
     bool resizeModeChanged = false;
@@ -274,9 +270,7 @@ void MaEditor::sl_zoomToSelection()
 }
 
 void MaEditor::sl_resetZoom() {
-    if (getSettingsRoot() == MCAE_SETTINGS_ROOT) {
-        GCOUNTER(cvar, tvar, "Reset zoom");
-    }
+    GRUNTIME_NAMED_COUNTER(cvat, tvar, "Reset zoom", getFactoryId());
     QFont f = getFont();
     f.setPointSize(MOBJECT_DEFAULT_FONT_SIZE);
     setFont(f);
@@ -310,9 +304,7 @@ void MaEditor::sl_saveAlignmentAs(){
 
 void MaEditor::sl_changeFont() {
     bool ok = false;
-    if (getSettingsRoot() == MCAE_SETTINGS_ROOT) {
-        GCOUNTER(cvar, tvar, "Change of the font characters font");
-    }
+    GRUNTIME_NAMED_COUNTER(cvat, tvar, "Change of the font characters font", getFactoryId());
     // QFontDialog::DontUseNativeDialog - no color selector, affects only Mac OS
     QFont f = QFontDialog::getFont(&ok, font, widget, tr("Characters Font"), QFontDialog::DontUseNativeDialog);
     if (!ok) {

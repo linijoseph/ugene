@@ -86,9 +86,18 @@ private:
     if (NULL == cvar) { \
         cvar = new GReportableCounter(name, suffix, 1); \
         cvar->destroyMe = true; \
-    } \
+        } \
     SimpleEventCounter tvar(cvar)
 
+#define GRUNTIME_NAMED_CONDITION_COUNTER(cvar, tvar, condition, name, suffix) \
+    if(condition) {\
+        GCounter *cvar = GCounter::getCounter(name, suffix); \
+        if (NULL == cvar) { \
+            cvar = new GReportableCounter(name, suffix, 1); \
+            cvar->destroyMe = true; \
+        } \
+        SimpleEventCounter tvar(cvar); \
+    }
 
 } //namespace
 

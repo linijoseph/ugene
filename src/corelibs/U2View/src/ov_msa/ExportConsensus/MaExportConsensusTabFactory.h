@@ -46,9 +46,6 @@ public:
 
     static const QString &getGroupId();
 
-protected:
-    void showEvent(QShowEvent *e);
-
 private:
     static const QString GROUP_ID;
 };

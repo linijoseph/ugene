@@ -103,9 +103,7 @@ void MaConsensusModeWidget::updateThresholdState(bool enable, int minVal, int ma
 }
 
 void MaConsensusModeWidget::sl_algorithmChanged(const QString& algoId) {
-    if (consArea->getEditorWgt()->getEditor()->getSettingsRoot() == MCAE_SETTINGS_ROOT) {
-        GCOUNTER(cvar, tvar, "Modification of the consensus type or threshold");
-    }
+    GRUNTIME_NAMED_COUNTER(cvat, tvar, "Modification of the consensus type or threshold", consArea->getEditorWgt()->getEditor()->getFactoryId());
     // Update state for the current algorithm
     SAFE_POINT(maObject != NULL, "MaConsensusModeWidget is not initialized", );
 
@@ -129,9 +127,7 @@ void MaConsensusModeWidget::sl_algorithmSelectionChanged(int index) {
 }
 
 void MaConsensusModeWidget::sl_thresholdSliderChanged(int value) {
-    if (consArea->getEditorWgt()->getEditor()->getSettingsRoot() == MCAE_SETTINGS_ROOT) {
-        GCOUNTER(cvar, tvar, "Modification of the consensus type or threshold");
-    }
+    GRUNTIME_NAMED_COUNTER(cvat, tvar, "Modification of the consensus type or threshold", consArea->getEditorWgt()->getEditor()->getFactoryId());
     thresholdSpinBox->disconnect(this);
     thresholdSpinBox->setValue(value);
     connect(thresholdSpinBox, SIGNAL(valueChanged(int)), SLOT(sl_thresholdSpinBoxChanged(int)));
