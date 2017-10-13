@@ -88,9 +88,8 @@ McaEditorWgt::McaEditorWgt(McaEditor *editor)
     collapseModel->collapseAll(!showChromatograms);
     collapseModel->setFakeCollapsibleModel(true);
     collapsibleMode = true;
-    if (showChromatograms) {
-        GCOUNTER(cvar, tvar, "\"Show chromatograms\" is checked");
-    }
+    GRUNTIME_NAMED_CONDITION_COUNTER(cvar, tvar, showChromatograms, "'Show chromatograms' is checked", "");
+    GRUNTIME_NAMED_CONDITION_COUNTER(ccvar, ttvar, !showChromatograms, "'Show chromatograms' is unchecked", "");
 
     McaEditorConsensusArea* mcaConsArea = qobject_cast<McaEditorConsensusArea*>(consArea);
     SAFE_POINT(mcaConsArea != NULL, "Failed to cast consensus area to MCA consensus area", );

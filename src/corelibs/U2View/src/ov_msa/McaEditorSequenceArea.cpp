@@ -235,7 +235,7 @@ void McaEditorSequenceArea::sl_backgroundSelectionChanged() {
 }
 
 void McaEditorSequenceArea::sl_showHideTrace() {
-    GCOUNTER(cvar, tvar, "Selection of a \"Show / hide trace\" item");
+    GCOUNTER(cvar, tvar, "Selection of a 'Show / hide trace' item");
     QAction* traceAction = qobject_cast<QAction*> (sender());
 
     if (!traceAction) {
@@ -272,11 +272,8 @@ void McaEditorSequenceArea::sl_showAllTraces() {
 void McaEditorSequenceArea::sl_setRenderAreaHeight(int k) {
     //k = chromaMax
     SequenceWithChromatogramAreaRenderer* r = qobject_cast<SequenceWithChromatogramAreaRenderer*>(renderer);
-    if (r->getAreaHeight() > k) {
-        GCOUNTER(cvar, tvar, "Increase peaks height");
-    } else {
-        GCOUNTER(cvar, tvar, "Decrease peaks height");
-    }
+    GRUNTIME_NAMED_CONDITION_COUNTER(cvar, tvar, r->getAreaHeight() > k, "Increase peaks height", "");
+    GRUNTIME_NAMED_CONDITION_COUNTER(ccvar, ttvar, r->getAreaHeight() < k, "Decrease peaks height", "");
     r->setAreaHeight(k);
     sl_completeUpdate();
 }
@@ -439,11 +436,8 @@ void McaEditorSequenceArea::insertChar(char newCharacter) {
     maObj->changeLength(os, maObj->getLength() + 1);
     maObj->insertCharacter(selection.y(), xSelection, newCharacter);
 
-    if (newCharacter == U2Msa::GAP_CHAR) {
-        GCOUNTER(cvar, tvar, "Insert gap using \"Insert character / gap\"");
-    } else {
-        GCOUNTER(cvar, tvar, "Insert character");
-    }
+    GRUNTIME_NAMED_CONDITION_COUNTER(cvar, tvar, newCharacter == U2Msa::GAP_CHAR, "Insert gap", "");
+    GRUNTIME_NAMED_CONDITION_COUNTER(ccvar, ttvar, newCharacter != U2Msa::GAP_CHAR, "Insert character", "");
 
     // insert char into the reference
     U2SequenceObject* ref = getEditor()->getMaObject()->getReferenceObj();

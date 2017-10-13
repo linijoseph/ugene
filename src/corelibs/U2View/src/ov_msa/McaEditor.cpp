@@ -234,9 +234,8 @@ void McaEditor::initActions() {
     showOverviewAction->setChecked(overviewVisible);
     ui->getOverviewArea()->setVisible(overviewVisible);
     changeFontAction->setText(tr("Change characters font..."));
-    if (overviewVisible) {
-        GCOUNTER(cvar, tvar, "\"Show overview\" is checked");
-    }
+    GRUNTIME_NAMED_CONDITION_COUNTER(cvar, tvar, overviewVisible, "'Show overview' is checked", "");
+    GRUNTIME_NAMED_CONDITION_COUNTER(ccvar, ttvar, !overviewVisible, "'Show overview' is unchecked", "");
 }
 
 void McaEditor::sl_saveOverviewState() {
