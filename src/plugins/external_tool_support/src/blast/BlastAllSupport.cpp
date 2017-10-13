@@ -24,6 +24,7 @@
 
 #include <U2Core/AppContext.h>
 #include <U2Core/AppSettings.h>
+#include <U2Core/Counter.h>
 #include <U2Core/DNASequenceSelection.h>
 #include <U2Core/L10n.h>
 #include <U2Core/U2OpStatusUtils.h>
@@ -146,6 +147,7 @@ void BlastAllSupport::sl_runAlign() {
 
     QObjectScopedPointer<AlignToReferenceBlastDialog> dlg = new AlignToReferenceBlastDialog(AppContext::getMainWindow()->getQMainWindow());
     dlg->exec();
+    GCOUNTER(cvar, tvar, "'Map reads to reference' dialog shown");
     CHECK(!dlg.isNull(), );
     CHECK(dlg->result() == QDialog::Accepted, );
 

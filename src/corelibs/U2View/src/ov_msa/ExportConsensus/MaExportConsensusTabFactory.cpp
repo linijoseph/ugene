@@ -20,9 +20,7 @@
  */
 
 #include <QPixmap>
-#include <QShowEvent>
 
-#include <U2Core/Counter.h>
 #include <U2Core/U2SafePoints.h>
 
 #include <U2Gui/ShowHideSubgroupWidget.h>

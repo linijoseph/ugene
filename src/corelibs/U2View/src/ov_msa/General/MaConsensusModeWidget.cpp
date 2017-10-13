@@ -34,7 +34,6 @@
 #include <U2Core/MultipleChromatogramAlignmentObject.h>
 #include <U2View/MSAEditorConsensusArea.h>
 
-
 namespace U2 {
 
 MaConsensusModeWidget::MaConsensusModeWidget(QWidget *parent)
