@@ -304,7 +304,7 @@ void MaEditor::sl_saveAlignmentAs(){
 
 void MaEditor::sl_changeFont() {
     bool ok = false;
-    GRUNTIME_NAMED_COUNTER(cvat, tvar, "Change of the font characters font", getFactoryId());
+    GRUNTIME_NAMED_COUNTER(cvat, tvar, "Change of the characters font", getFactoryId());
     // QFontDialog::DontUseNativeDialog - no color selector, affects only Mac OS
     QFont f = QFontDialog::getFont(&ok, font, widget, tr("Characters Font"), QFontDialog::DontUseNativeDialog);
     if (!ok) {

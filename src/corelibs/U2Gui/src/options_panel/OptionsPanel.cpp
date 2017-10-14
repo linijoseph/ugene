@@ -84,7 +84,6 @@ void OptionsPanel::sl_groupHeaderPressed(QString groupId) {
 
     // Implement the logic of the groups opening/closing
     if (OPMainWidgetState_Closed == widget->getState()) {
-        GRUNTIME_NAMED_COUNTER(cvat, tvar, "Opening tab: ", groupId);
         widget->openOptionsPanel();
         openOptionsGroup(groupId);
         return;
@@ -96,7 +95,6 @@ void OptionsPanel::sl_groupHeaderPressed(QString groupId) {
         closeOptionsGroup(groupId);
         return;
     } else { // Another group has been selected
-        GRUNTIME_NAMED_COUNTER(cvat, tvar, "Opening tab: ", groupId);
         closeOptionsGroup(activeGroupId);
         openOptionsGroup(groupId);
     }
@@ -109,7 +107,7 @@ void OptionsPanel::openOptionsGroup(const QString& groupId) {
         widget->focusOptionsWidget(groupId);
         return;
     }
-
+    GRUNTIME_NAMED_COUNTER(cvat, tvar, QString("Opening tab: %1").arg(groupId), objView->getFactoryId());
     OPWidgetFactory* opWidgetFactory = findFactoryByGroupId(groupId);
     SAFE_POINT(NULL != opWidgetFactory,
         QString("Internal error: can't open a group with ID '%1' on the Options Panel.").arg(groupId),);

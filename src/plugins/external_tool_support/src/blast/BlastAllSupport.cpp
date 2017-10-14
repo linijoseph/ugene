@@ -147,7 +147,6 @@ void BlastAllSupport::sl_runAlign() {
 
     QObjectScopedPointer<AlignToReferenceBlastDialog> dlg = new AlignToReferenceBlastDialog(AppContext::getMainWindow()->getQMainWindow());
     dlg->exec();
-    GCOUNTER(cvar, tvar, "'Map reads to reference' dialog shown");
     CHECK(!dlg.isNull(), );
     CHECK(dlg->result() == QDialog::Accepted, );
 

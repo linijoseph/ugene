@@ -88,8 +88,8 @@ McaEditorWgt::McaEditorWgt(McaEditor *editor)
     collapseModel->collapseAll(!showChromatograms);
     collapseModel->setFakeCollapsibleModel(true);
     collapsibleMode = true;
-    GRUNTIME_NAMED_CONDITION_COUNTER(cvar, tvar, showChromatograms, "'Show chromatograms' is checked", "");
-    GRUNTIME_NAMED_CONDITION_COUNTER(ccvar, ttvar, !showChromatograms, "'Show chromatograms' is unchecked", "");
+    GRUNTIME_NAMED_CONDITION_COUNTER(cvar, tvar, showChromatograms, "'Show chromatograms' is checked", editor->getFactoryId());
+    GRUNTIME_NAMED_CONDITION_COUNTER(ccvar, ttvar, !showChromatograms, "'Show chromatograms' is unchecked", editor->getFactoryId());
 
     McaEditorConsensusArea* mcaConsArea = qobject_cast<McaEditorConsensusArea*>(consArea);
     SAFE_POINT(mcaConsArea != NULL, "Failed to cast consensus area to MCA consensus area", );
@@ -98,9 +98,6 @@ McaEditorWgt::McaEditorWgt(McaEditor *editor)
     connect(mcaConsArea->getMismatchController(), SIGNAL(si_selectMismatch(int)), refArea, SLOT(sl_selectMismatch(int)));
     MultipleChromatogramAlignmentObject* mcaObj = editor->getMaObject();
     connect(mcaObj, SIGNAL(si_alignmentChanged(const MultipleAlignment&, const MaModificationInfo&)), SLOT(sl_alignmentChanged()));
-
-    connect(getUndoAction(), SIGNAL(triggered()), SLOT(sl_countUndo()));
-    connect(getRedoAction(), SIGNAL(triggered()), SLOT(sl_countRedo()));
 }
 
 void McaEditorWgt::sl_alignmentChanged() {
@@ -176,14 +173,6 @@ void McaEditorWgt::initConsensusArea() {
 
 void McaEditorWgt::initStatusBar() {
     statusBar = new McaEditorStatusBar(editor->getMaObject(), seqArea, getEditorNameList(), refCharController);
-}
-
-void McaEditorWgt::sl_countUndo() {
-    GCOUNTER(cvar, tvar, "Undo");
-}
-
-void McaEditorWgt::sl_countRedo() {
-    GCOUNTER(cvar, tvar, "Redo");
 }
 
 }   // namespace U2

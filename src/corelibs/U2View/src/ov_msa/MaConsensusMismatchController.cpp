@@ -87,12 +87,12 @@ void MaConsensusMismatchController::sl_resize(int newSize) {
 }
 
 void MaConsensusMismatchController::sl_next() {
-    GCOUNTER(cvar, tvar, "Jump to next variation");
+    GRUNTIME_NAMED_COUNTER(cvar, tvar, "Jump to next variation", editor->getFactoryId());
     selectNextMismatch(Forward);
 }
 
 void MaConsensusMismatchController::sl_prev() {
-    GCOUNTER(cvar, tvar, "Jump to previous variation");
+    GRUNTIME_NAMED_COUNTER(cvar, tvar, "Jump to previous variation", editor->getFactoryId());
     selectNextMismatch(Backward);
 }
 

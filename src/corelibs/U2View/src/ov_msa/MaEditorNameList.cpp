@@ -246,7 +246,7 @@ void MaEditorNameList::sl_alignmentChanged(const MultipleAlignment&, const MaMod
 }
 
 void MaEditorNameList::sl_removeSequence() {
-    GRUNTIME_NAMED_COUNTER(cvat, tvar, "Remove read", editor->getFactoryId());
+    GRUNTIME_NAMED_COUNTER(cvat, tvar, "Remove row", editor->getFactoryId());
     U2Region sel = getSelection();
     CHECK(!sel.isEmpty(), );
 
@@ -824,7 +824,7 @@ void MaEditorNameList::drawSelection(QPainter &painter) {
 }
 
 void MaEditorNameList::sl_editSequenceName() {
-    GRUNTIME_NAMED_COUNTER(cvat, tvar, "Rename read", editor->getFactoryId());
+    GRUNTIME_NAMED_COUNTER(cvat, tvar, "Rename row", editor->getFactoryId());
     MultipleAlignmentObject* maObj = editor->getMaObject();
     CHECK(!maObj->isStateLocked(), );
 

@@ -118,7 +118,7 @@ QList<GObject *> DbiDocumentFormat::prepareObjects(DbiConnection &handle, const 
         handle.dbi->getObjectDbi()->getObject(object, id, status);
         CHECK_OPERATION(!status.isCoR(), continue);
 
-        GRUNTIME_NAMED_CONDITION_COUNTER(tvar, cvar, object.getType() == U2Type::Mca, "Number of mca objects opened from ugenedb files","" );
+        GRUNTIME_NAMED_CONDITION_COUNTER(tvar, cvar, object.getType() == U2Type::Mca, "Number of mca objects opened from ugenedb files", "");
 
         if (object.visualName.isEmpty()) {
             object.visualName = "Unnamed object";

@@ -147,7 +147,7 @@ bool MaEditorConsensusArea::event(QEvent* e) {
 
 void MaEditorConsensusArea::initCache() {
     MSAConsensusAlgorithmFactory *algo = getConsensusAlgorithmFactory();
-    GRUNTIME_NAMED_COUNTER(cvar, tvar, algo->getName() + " consensus type is selected", editor->getFactoryId());
+    GRUNTIME_NAMED_COUNTER(cvar, tvar, algo->getName() + " consensus type is selected on view opening", editor->getFactoryId());
     consensusCache = QSharedPointer<MSAEditorConsensusCache>(new MSAEditorConsensusCache(NULL, editor->getMaObject(), algo));
     connect(consensusCache->getConsensusAlgorithm(), SIGNAL(si_thresholdChanged(int)), SLOT(sl_onConsensusThresholdChanged(int)));
     restoreLastUsedConsensusThreshold();
@@ -302,7 +302,6 @@ void MaEditorConsensusArea::sl_changeConsensusAlgorithm(const QString& algoId) {
     if (getConsensusAlgorithm()->getFactory() != algoFactory) {
         assert(algoFactory!=NULL);
         setConsensusAlgorithm(algoFactory);
-        GRUNTIME_NAMED_COUNTER(cvar, tvar, algoFactory->getName() + " consensus type is selected", editor->getFactoryId());
     }
     emit si_consensusAlgorithmChanged(algoId);
 }
@@ -316,6 +315,7 @@ void MaEditorConsensusArea::setConsensusAlgorithm(MSAConsensusAlgorithmFactory* 
     if (oldAlgo!=NULL && algoFactory == oldAlgo->getFactory()) {
         return;
     }
+    GRUNTIME_NAMED_COUNTER(cvar, tvar, algoFactory->getName() + " consensus algorithm is selected", editor->getFactoryId());
 
     //store threshold for the active algo
     if (oldAlgo!=NULL && oldAlgo->supportsThreshold()) {

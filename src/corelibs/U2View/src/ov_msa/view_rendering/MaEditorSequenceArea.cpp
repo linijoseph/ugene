@@ -49,6 +49,7 @@
 #include "MaEditorWgt.h"
 #include "SequenceAreaRenderer.h"
 #include "ov_msa/MaEditor.h"
+#include "ov_msa/McaEditorWgt.h"
 #include "ov_msa/MSACollapsibleModel.h"
 #include "ov_msa/helpers/BaseWidthController.h"
 #include "ov_msa/helpers/DrawHelper.h"
@@ -377,8 +378,9 @@ void MaEditorSequenceArea::deleteCurrentSelection() {
             return;
         }
     }
-    GRUNTIME_NAMED_CONDITION_COUNTER(cvar, tvar, maObj->getRow(selection.topLeft().y())->charAt(selection.topLeft().x()) == U2Msa::GAP_CHAR, "Remove gap", editor->getFactoryId());
-    GRUNTIME_NAMED_CONDITION_COUNTER(ccvar, ttvar, maObj->getRow(selection.topLeft().y())->charAt(selection.topLeft().x()) != U2Msa::GAP_CHAR, "Remove character", editor->getFactoryId());
+    bool isGap = maObj->getRow(selection.topLeft().y())->charAt(selection.topLeft().x()) == U2Msa::GAP_CHAR;
+    GRUNTIME_NAMED_CONDITION_COUNTER(cvar, tvar, isGap, "Remove gap", editor->getFactoryId());
+    GRUNTIME_NAMED_CONDITION_COUNTER(ccvar, ttvar, !isGap, "Remove character", editor->getFactoryId());
     sl_cancelSelection();
 }
 
@@ -657,13 +659,13 @@ void MaEditorSequenceArea::sl_delCurrentSelection() {
 }
 
 void MaEditorSequenceArea::sl_cancelSelection() {
-    GRUNTIME_NAMED_COUNTER(cvat, tvar, "Clear selection", editor->getFactoryId());
+    GRUNTIME_NAMED_CONDITION_COUNTER(cvat, tvar, qobject_cast<McaEditorWgt*>(sender()) != NULL, "Clear selection", editor->getFactoryId());
     MaEditorSelection emptySelection;
     setSelection(emptySelection);
 }
 
 void MaEditorSequenceArea::sl_fillCurrentSelectionWithGaps() {
-    GRUNTIME_NAMED_COUNTER(cvat, tvar, "Insert gap", editor->getFactoryId());
+    GRUNTIME_NAMED_COUNTER(cvat, tvar, "Fill selection with gaps", editor->getFactoryId());
     if(!isAlignmentLocked()) {
         emit si_startMaChanging();
         insertGapsBeforeSelection();
@@ -801,7 +803,6 @@ void MaEditorSequenceArea::sl_changeHighlightScheme(){
 }
 
 void MaEditorSequenceArea::sl_replaceSelectedCharacter() {
-    GRUNTIME_NAMED_COUNTER(cvat, tvar, "Replace character", editor->getFactoryId());
     maMode = ReplaceCharMode;
     editModeAnimationTimer.start(500);
     highlightCurrentSelection();

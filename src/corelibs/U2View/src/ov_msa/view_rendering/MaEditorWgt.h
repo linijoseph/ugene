@@ -107,6 +107,10 @@ protected:
     virtual void initConsensusArea() = 0;
     virtual void initStatusBar() = 0;
 
+protected slots:
+    void sl_countUndo();
+    void sl_countRedo();
+
 protected:
     MaEditor*                       editor;
     MaEditorSequenceArea*           seqArea;
