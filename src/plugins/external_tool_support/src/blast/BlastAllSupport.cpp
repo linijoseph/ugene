@@ -24,7 +24,6 @@
 
 #include <U2Core/AppContext.h>
 #include <U2Core/AppSettings.h>
-#include <U2Core/Counter.h>
 #include <U2Core/DNASequenceSelection.h>
 #include <U2Core/L10n.h>
 #include <U2Core/U2OpStatusUtils.h>

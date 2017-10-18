@@ -320,12 +320,12 @@ void McaEditorSequenceArea::sl_removeColumnsOfGaps() {
 }
 
 void McaEditorSequenceArea::sl_trimLeftEnd() {
-    GCOUNTER(cvar, tvar, "Trim left end");
+    GRUNTIME_NAMED_COUNTER(cvar, tvar, "Trim left end", editor->getFactoryId());
     trimRowEnd(MultipleChromatogramAlignmentObject::Left);
 }
 
 void McaEditorSequenceArea::sl_trimRightEnd() {
-    GCOUNTER(cvar, tvar, "Trim right end");
+    GRUNTIME_NAMED_COUNTER(cvar, tvar, "Trim right end", editor->getFactoryId());
     trimRowEnd(MultipleChromatogramAlignmentObject::Right);
 }
 

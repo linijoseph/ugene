@@ -18,13 +18,11 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301, USA.
  */
-#include <QShowEvent>
+
+#include <U2Gui/ShowHideSubgroupWidget.h>
 
 #include "McaGeneralTab.h"
-#include "../McaEditor.h"
-
-#include <U2Core/Counter.h>
-#include <U2Gui/ShowHideSubgroupWidget.h>
+#include "ov_msa/McaEditor.h"
 
 namespace U2 {
 

@@ -19,10 +19,6 @@
  * MA 02110-1301, USA.
  */
 
-#include "MaConsensusModeWidget.h"
-#include "../view_rendering/MaEditorWgt.h"
-#include "../MaEditor.h"
-
 #include <U2Algorithm/MSAConsensusAlgorithmRegistry.h>
 
 #include <U2Core/AppContext.h>
@@ -33,6 +29,10 @@
 #include <U2Core/MultipleAlignmentObject.h>
 #include <U2Core/MultipleChromatogramAlignmentObject.h>
 #include <U2View/MSAEditorConsensusArea.h>
+
+#include "MaConsensusModeWidget.h"
+#include "ov_msa/MaEditor.h"
+#include "ov_msa/view_rendering/MaEditorWgt.h"
 
 namespace U2 {
 

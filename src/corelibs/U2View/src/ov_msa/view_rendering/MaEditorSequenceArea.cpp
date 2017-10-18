@@ -373,14 +373,16 @@ void MaEditorSequenceArea::deleteCurrentSelection() {
 
     const U2Region& sel = getSelectedRows();
     maObj->removeRegion(selection.x(), sel.startPos, selection.width(), sel.length, true);
+
     if (selection.height() == 1 && selection.width() == 1) {
+        bool isGap = maObj->getRow(selection.topLeft().y())->isGap(selection.topLeft().x());
+        GRUNTIME_NAMED_CONDITION_COUNTER(cvar, tvar, isGap, "Remove gap", editor->getFactoryId());
+        GRUNTIME_NAMED_CONDITION_COUNTER(ccvar, ttvar, !isGap, "Remove character", editor->getFactoryId());
+
         if (isInRange(selection.topLeft())) {
             return;
         }
     }
-    bool isGap = maObj->getRow(selection.topLeft().y())->charAt(selection.topLeft().x()) == U2Msa::GAP_CHAR;
-    GRUNTIME_NAMED_CONDITION_COUNTER(cvar, tvar, isGap, "Remove gap", editor->getFactoryId());
-    GRUNTIME_NAMED_CONDITION_COUNTER(ccvar, ttvar, !isGap, "Remove character", editor->getFactoryId());
     sl_cancelSelection();
 }
 

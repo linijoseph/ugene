@@ -97,6 +97,10 @@ signals:
 public slots:
     void sl_saveScreenshot();
 
+private slots:
+    void sl_countUndo();
+    void sl_countRedo();
+
 protected:
     virtual void initWidgets();
     virtual void initActions();
@@ -106,10 +110,6 @@ protected:
     virtual void initNameList(QScrollBar* nhBar) = 0;
     virtual void initConsensusArea() = 0;
     virtual void initStatusBar() = 0;
-
-protected slots:
-    void sl_countUndo();
-    void sl_countRedo();
 
 protected:
     MaEditor*                       editor;
