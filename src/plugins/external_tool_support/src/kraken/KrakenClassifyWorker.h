@@ -19,43 +19,52 @@
  * MA 02110-1301, USA.
  */
 
-#ifndef _U2_DATASET_FETCHER_H_
-#define _U2_DATASET_FETCHER_H_
+#ifndef _U2_KRAKEN_CLASSIFY_WORKER_H_
+#define _U2_KRAKEN_CLASSIFY_WORKER_H_
 
 #include <U2Lang/LocalDomain.h>
+
+#include "KrakenClassifyTaskSettings.h"
 
 namespace U2 {
 namespace LocalWorkflow {
 
-class U2LANG_EXPORT DatasetFetcher {
+class DatasetFetcher;
+
+class KrakenClassifyWorker : public BaseWorker {
 public:
-    DatasetFetcher();
-    DatasetFetcher(BaseWorker *worker, IntegralBus *port, WorkflowContext *context);
+    KrakenClassifyWorker(Actor* actor);
 
-    bool hasFullDataset() const;
-    bool isDone() const;
-    const QString &getDatasetName() const;  // must be got before takeFullDataset call
-    QList<Message> takeFullDataset();
-    void processInputMessage();
-
-private:
-    QString getDatasetName(const Message &message) const;
-    bool datasetChanged(const Message &message) const;
-    void takeMessage();
+    void init();
+    Task *tick();
     void cleanup();
 
-private:
-    BaseWorker *worker;
-    IntegralBus *port;
-    WorkflowContext *context;
+private slots:
+    void sl_taskFinished();
 
-    bool datasetInitialized;
-    bool fullDataset;
+private:
+    bool isReadyToRun() const;
+    bool dataFinished() const;
+    QString checkPairedReads() const;
+
+    KrakenClassifyTaskSettings getSettings(U2OpStatus &os) const;
+
+    IntegralBus *input;
+    IntegralBus *pairedInput;
+    IntegralBus *output;
+
+    DatasetFetcher *readsFetcher;
+    DatasetFetcher *pairedReadsFetcher;
+
+    bool pairedReadsInput;
     QString datasetName;
-    QList<Message> datasetMessages;
+
+    static const QString INPUT_PORT_ID;
+    static const QString PAIRED_INPUT_PORT_ID;
+    static const QString OUTPUT_PORT_ID;
 };
 
-} //LocalWorkflow
-} //U2
+}   // namespace LocalWorkflow
+}   // namespace U2
 
-#endif //_U2_DATASET_FETCHER_H_
+#endif // _U2_KRAKEN_CLASSIFY_WORKER_H_

@@ -456,7 +456,9 @@ ProcessRun ExternalToolSupportUtils::prepareProcess(const QString &toolName, con
 #endif
 
     QProcessEnvironment processEnvironment = QProcessEnvironment::systemEnvironment();
-    QString path = additionalPaths.join(pathVariableSeparator) + pathVariableSeparator + processEnvironment.value("PATH");
+    QString path = additionalPaths.join(pathVariableSeparator) + pathVariableSeparator +
+                   tool->getAdditionalPaths().join(pathVariableSeparator) + pathVariableSeparator +
+                   processEnvironment.value("PATH");
     if (!additionalPaths.isEmpty()) {
         algoLog.trace(QString("PATH environment variable: '%1'").arg(path));
     }

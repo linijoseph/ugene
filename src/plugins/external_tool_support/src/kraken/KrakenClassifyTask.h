@@ -19,31 +19,30 @@
  * MA 02110-1301, USA.
  */
 
-#ifndef _U2_KRAKEN_SUPPORT_H_
-#define _U2_KRAKEN_SUPPORT_H_
+#ifndef _U2_KRAKEN_CLASSIFY_TASK_H_
+#define _U2_KRAKEN_CLASSIFY_TASK_H_
 
-#include <U2Core/ExternalToolRegistry.h>
+#include <U2Core/ExternalToolRunTask.h>
+
+#include "KrakenClassifyTaskSettings.h"
 
 namespace U2 {
 
-#define ET_KRAKEN_CLASSIFY KrakenSupport::CLASSIFY_TOOL
-#define ET_KRAKEN_BUILD KrakenSupport::BUILD_TOOL
-
-class KrakenSupport : public ExternalTool {
+class KrakenClassifyTask : public ExternalToolSupportTask {
     Q_OBJECT
 public:
-    KrakenSupport(const QString &name);
+    KrakenClassifyTask(const KrakenClassifyTaskSettings &settings);
 
-    QStringList getAdditionalPaths() const;
-
-    static const QString BUILD_TOOL;
-    static const QString CLASSIFY_TOOL;
+    const QString &getReportUrl() const;
 
 private:
-    void initBuild();
-    void initClassify();
+    void prepare();
+
+    QStringList getArguments();
+
+    const KrakenClassifyTaskSettings settings;
 };
 
 }   // namespace U2
 
-#endif // _U2_KRAKEN_SUPPORT_H_
+#endif // _U2_KRAKEN_CLASSIFY_TASK_H_
