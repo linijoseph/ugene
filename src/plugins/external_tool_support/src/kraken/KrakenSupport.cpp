@@ -31,8 +31,7 @@ namespace U2 {
 
 const QString KrakenSupport::BUILD_TOOL = "kraken-build";
 const QString KrakenSupport::CLASSIFY_TOOL = "kraken";
-const QString KrakenSupport::TRANSLATE_TOOL = "kraken";
-const QString KrakenSupport::REPORT_TOOL = "kraken";
+const QString KrakenSupport::TRANSLATE_TOOL = "kraken-translate";
 
 KrakenSupport::KrakenSupport(const QString &name)
     : ExternalTool(name)
@@ -61,10 +60,6 @@ KrakenSupport::KrakenSupport(const QString &name)
     if (TRANSLATE_TOOL == name) {
         initTranslate();
     }
-
-    if (REPORT_TOOL == name) {
-        initReport();
-    }
 }
 
 QStringList KrakenSupport::getAdditionalPaths() const {
@@ -87,11 +82,6 @@ void KrakenSupport::initClassify() {
 void KrakenSupport::initTranslate() {
     executableFileName = "kraken-translate";
     description = tr("The \"<i>kraken-translate</i>\" executable is used to translate the Kraken classification to make it more readable.");
-}
-
-void KrakenSupport::initReport() {
-    executableFileName = "kraken-report";
-    description = tr("The \"<i>kraken-report</i>\" executable is used make a report about reads classification.");
 }
 
 }   // namespace U2

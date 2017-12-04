@@ -28,6 +28,7 @@ namespace U2 {
 
 #define ET_KRAKEN_CLASSIFY KrakenSupport::CLASSIFY_TOOL
 #define ET_KRAKEN_BUILD KrakenSupport::BUILD_TOOL
+#define ET_KRAKEN_TRANSLATE KrakenSupport::TRANSLATE_TOOL
 
 class KrakenSupport : public ExternalTool {
     Q_OBJECT
@@ -38,10 +39,12 @@ public:
 
     static const QString BUILD_TOOL;
     static const QString CLASSIFY_TOOL;
+    static const QString TRANSLATE_TOOL;
 
 private:
     void initBuild();
     void initClassify();
+    void initTranslate();
 };
 
 }   // namespace U2

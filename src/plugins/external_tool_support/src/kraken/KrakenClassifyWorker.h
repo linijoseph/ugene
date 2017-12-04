@@ -29,8 +29,6 @@
 namespace U2 {
 namespace LocalWorkflow {
 
-class DatasetFetcher;
-
 class KrakenClassifyWorker : public BaseWorker {
 public:
     KrakenClassifyWorker(Actor* actor);
@@ -47,14 +45,11 @@ private:
     bool dataFinished() const;
     QString checkPairedReads() const;
 
-    KrakenClassifyTaskSettings getSettings(U2OpStatus &os) const;
+    KrakenClassifyTaskSettings getSettings();
 
     IntegralBus *input;
     IntegralBus *pairedInput;
     IntegralBus *output;
-
-    DatasetFetcher *readsFetcher;
-    DatasetFetcher *pairedReadsFetcher;
 
     bool pairedReadsInput;
     QString datasetName;

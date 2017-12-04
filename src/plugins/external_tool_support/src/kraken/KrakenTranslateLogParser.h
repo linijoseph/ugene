@@ -19,14 +19,24 @@
  * MA 02110-1301, USA.
  */
 
-#ifndef KRAKENTRANSLATETASK_H
-#define KRAKENTRANSLATETASK_H
+#ifndef _U2_KRAKEN_TRANSLATE_LOG_PARSER_H_
+#define _U2_KRAKEN_TRANSLATE_LOG_PARSER_H_
 
+#include <U2Core/ExternalToolRunTask.h>
 
-class KrakenTranslateTask
-{
+namespace U2 {
+
+class KrakenTranslateLogParser : public ExternalToolLogParser {
 public:
-    KrakenTranslateTask();
+    KrakenTranslateLogParser();
+
+private:
+    bool isError(const QString &line) const;
+
+    static const QStringList wellKnownErrors;
+    static QStringList initWellKnownErrors();
 };
 
-#endif // KRAKENTRANSLATETASK_H
+}   // namespace U2
+
+#endif // _U2_KRAKEN_TRANSLATE_LOG_PARSER_H_

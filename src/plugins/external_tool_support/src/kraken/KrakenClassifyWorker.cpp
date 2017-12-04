@@ -20,9 +20,9 @@
  */
 
 #include <U2Core/FailTask.h>
+#include <U2Core/MultiTask.h>
 #include <U2Core/U2OpStatusUtils.h>
 
-#include <U2Lang/DatasetFetcher.h>
 #include <U2Lang/WorkflowMonitor.h>
 
 #include "KrakenClassifyTask.h"
@@ -40,9 +40,7 @@ KrakenClassifyWorker::KrakenClassifyWorker(Actor *actor)
     : BaseWorker(actor),
       input(NULL),
       pairedInput(NULL),
-      output(NULL),
-      readsFetcher(NULL),
-      pairedReadsFetcher(NULL)
+      output(NULL)
 {
 
 }
@@ -54,27 +52,14 @@ void KrakenClassifyWorker::init() {
 
     pairedReadsInput = (getValue<QString>(KrakenClassifyWorkerFactory::SEQUENCING_READS_ATTR_ID) == KrakenClassifyTaskSettings::PAIRED_END);
 
-    readsFetcher = new DatasetFetcher(this, input, context);
-    pairedReadsFetcher = new DatasetFetcher(this, input, context);
+    output->addComplement(input);
+    input->addComplement(output);
 }
 
 Task *KrakenClassifyWorker::tick() {
-    readsFetcher->processInputMessage();
-    if (pairedReadsInput) {
-        pairedReadsFetcher->processInputMessage();
-    }
-
     if (isReadyToRun()) {
-        datasetName = readsFetcher->getDatasetName();
-
-        U2OpStatus2Log os;
-        KrakenClassifyTaskSettings settings = getSettings(os);
-        if (os.hasError()) {
-            return new FailTask(os.getError());
-        }
-
-        KrakenClassifyTask *task = new KrakenClassifyTask(settings);
-        task->addListeners(createLogListeners());
+        KrakenClassifyTask *task = new KrakenClassifyTask(getSettings());
+        task->addListeners(createLogListeners(2));
         connect(task, SIGNAL(si_stateChanged()), SLOT(sl_taskFinished()));
         return task;
     }
@@ -104,57 +89,50 @@ void KrakenClassifyWorker::sl_taskFinished() {
         return;
     }
 
-    const QString reportUrl = task->getReportUrl();
+    const QString rawClassificationUrl = task->getRawClassificationUrl();
+    const QString translatedClassificationUrl = task->getTranslatedClassificationUrl();
 
     QVariantMap data;
-    data[KrakenClassifyWorkerFactory::OUTPUT_REPORT_URL_SLOT_ID] = reportUrl;
+    data[KrakenClassifyWorkerFactory::OUTPUT_REPORT_URL_SLOT_ID] = rawClassificationUrl;
     output->put(Message(output->getBusType(), data));
 
-    const MessageMetadata metadata(datasetName);
-    context->getMetadataStorage().put(metadata);
-
-    output->put(Message(output->getBusType(), data, metadata.getId()));
-    context->getMonitor()->addOutputFile(reportUrl, getActor()->getId());
+    output->put(Message(output->getBusType(), data));
+    context->getMonitor()->addOutputFile(translatedClassificationUrl, getActor()->getId());
 }
 
 bool KrakenClassifyWorker::isReadyToRun() const {
-    return readsFetcher->hasFullDataset() && (!pairedReadsInput || pairedReadsFetcher->hasFullDataset());
+    return input->hasMessage() && (!pairedReadsInput || pairedInput->hasMessage());
 }
 
 bool KrakenClassifyWorker::dataFinished() const {
-    return readsFetcher->isDone() && (!pairedReadsInput || pairedReadsFetcher->isDone());
+    return input->isEnded() || (pairedReadsInput && pairedInput->isEnded());
 }
 
 QString KrakenClassifyWorker::checkPairedReads() const {
     CHECK(pairedReadsInput, "");
-    if (readsFetcher->isDone() && pairedReadsFetcher->hasFullDataset()) {
-        return tr("Not enough upstream reads datasets");
-    }
-    if (pairedReadsFetcher->isDone() && readsFetcher->hasFullDataset()) {
+    if (input->isEnded() && (!pairedInput->isEnded() || pairedInput->hasMessage())) {
         return tr("Not enough downstream reads datasets");
+    }
+    if (pairedInput->isEnded() && (!input->isEnded() || input->hasMessage())) {
+        return tr("Not enough upstream reads datasets");
     }
     return "";
 }
 
-KrakenClassifyTaskSettings KrakenClassifyWorker::getSettings(U2OpStatus &os) const {
+KrakenClassifyTaskSettings KrakenClassifyWorker::getSettings() {
     KrakenClassifyTaskSettings settings;
     settings.databaseUrl = getValue<QString>(KrakenClassifyWorkerFactory::DATABASE_ATTR_ID);
-    // TODO: add taxonomy parameter
     settings.quickOperation = getValue<bool>(KrakenClassifyWorkerFactory::QUICK_OPERATION_ATTR_ID);
     settings.minNumberOfHits = getValue<int>(KrakenClassifyWorkerFactory::MIN_HITS_NUMBER_ATTR_ID);
     settings.numberOfThreads = getValue<int>(KrakenClassifyWorkerFactory::THREADS_NUMBER_ATTR_ID);
     settings.preloadDatabase = getValue<bool>(KrakenClassifyWorkerFactory::PRELOAD_DATABASE_ATTR_ID);
 
-    const QList<Message> readsMessages = readsFetcher->takeFullDataset();
-    foreach (const Message &message, readsMessages) {
-        settings.readsUrls << message.getData().toString();
-    }
+    const Message message = getMessageAndSetupScriptValues(input);
+    settings.readsUrl = message.getData().toString();
 
-    if (getValue<QString>(KrakenClassifyWorkerFactory::SEQUENCING_READS_ATTR_ID) == KrakenClassifyTaskSettings::PAIRED_END) {
-        const QList<Message> pairedReadsMessages = pairedReadsFetcher->takeFullDataset();
-        foreach (const Message &message, pairedReadsMessages) {
-            settings.pairedReadsUrls << message.getData().toString();
-        }
+    if (pairedReadsInput) {
+        const Message pairedMessage = getMessageAndSetupScriptValues(pairedInput);
+        settings.pairedReadsUrl = pairedMessage.getData().toString();
     }
 
     return settings;

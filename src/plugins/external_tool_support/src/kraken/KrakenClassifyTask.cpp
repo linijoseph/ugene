@@ -24,53 +24,86 @@
 #include <U2Core/U2SafePoints.h>
 
 #include "KrakenSupport.h"
+#include "KrakenClassifyLogParser.h"
 #include "KrakenClassifyTask.h"
+#include "KrakenTranslateLogParser.h"
 
 namespace U2 {
 
 KrakenClassifyTask::KrakenClassifyTask(const KrakenClassifyTaskSettings &settings)
     : ExternalToolSupportTask(tr("Classify reads with Kraken"), TaskFlags_FOSE_COSC),
-      settings(settings)
+      settings(settings),
+      classifyTask(NULL)
 {
     GCOUNTER(cvar, tvar, "KrakenClassifyTask");
+
+    SAFE_POINT_EXT(!settings.readsUrl.isEmpty(), setError("Reads URL is empty"), );
+    SAFE_POINT_EXT(!settings.pairedReads || !settings.readsUrl.isEmpty(), setError("Paired reads URL is empty, but the 'paired reads' option is set"), );
+    SAFE_POINT_EXT(!settings.databaseUrl.isEmpty(), setError("Kraken database URL is empty"), );
+    SAFE_POINT_EXT(!settings.rawClassificationUrl.isEmpty(), setError("Kraken classification URL is empty"), );
+    SAFE_POINT_EXT(!settings.translatedClassificationUrl.isEmpty(), setError("URL to write translated Kraken classification is empty"), );
 }
 
-const QString &KrakenClassifyTask::getReportUrl() const {
-    return settings.reportUrl;
+const QString &KrakenClassifyTask::getRawClassificationUrl() const {
+    return settings.rawClassificationUrl;
+}
+
+const QString &KrakenClassifyTask::getTranslatedClassificationUrl() const {
+    return settings.translatedClassificationUrl;
 }
 
 void KrakenClassifyTask::prepare() {
-    QScopedPointer<ExternalToolRunTask> task(new ExternalToolRunTask(ET_KRAKEN_CLASSIFY, getArguments(), NULL));
-    CHECK_OP(stateInfo, );
-    setListenerForTask(task.data());
-    addSubTask(task.take());
+    classifyTask = new ExternalToolRunTask(ET_KRAKEN_CLASSIFY, getClassifyArguments(), new KrakenClassifyLogParser());
+    setListenerForTask(classifyTask);
+    addSubTask(classifyTask);
 }
 
-QStringList KrakenClassifyTask::getArguments() {
-    // TODO: taxonomy is not processed
+QList<Task *> KrakenClassifyTask::onSubTaskFinished(Task *subTask) {
+    QList<Task *> newSubTasks;
+    CHECK_OP(stateInfo, newSubTasks);
 
+    if (classifyTask == subTask) {
+        ExternalToolRunTask *translateTask = new ExternalToolRunTask(KrakenSupport::TRANSLATE_TOOL, getTranslateArguments(), new KrakenTranslateLogParser());
+        translateTask->setStandartOutputFile(settings.translatedClassificationUrl);
+        setListenerForTask(translateTask, 1);
+        newSubTasks << translateTask;
+    }
+
+    return newSubTasks;
+}
+
+QStringList KrakenClassifyTask::getClassifyArguments() {
     QStringList arguments;
     arguments << "--db" << settings.databaseUrl;
     arguments << "--threads" << QString::number(settings.numberOfThreads);
+
     if (settings.quickOperation) {
         arguments << "--quick";
         arguments << "--min-hits" << QString::number(settings.minNumberOfHits);
     }
-    arguments << "--output" << settings.reportUrl;
+
+    arguments << "--output" << settings.rawClassificationUrl;
     if (settings.preloadDatabase) {
         arguments << "--preload";
     }
-    if (!settings.pairedReadsUrls.isEmpty()) {
-        CHECK_EXT(settings.readsUrls.size() == settings.pairedReadsUrls.size(), setError(tr("Direct reads URLs count doesn't fit reverse reads URLs count")), QStringList());
+
+    if (settings.pairedReads) {
         arguments << "--paired";
+        arguments << "--check-names";
     }
-    arguments << "--check-names";
 
-    // TODO: check, if there could be more than 1 URL in the list, if "paired" option is set
-    // Add a check for 1 per list and do not add paired, if paired is turned off
-    arguments << settings.readsUrls;
-    arguments << settings.pairedReadsUrls;
+    arguments << settings.readsUrl;
+    if (settings.pairedReads) {
+        arguments << settings.pairedReadsUrl;
+    }
 
+    return arguments;
+}
+
+QStringList KrakenClassifyTask::getTranslateArguments() {
+    QStringList arguments;
+    arguments << "--db" << settings.databaseUrl;
+    arguments << settings.rawClassificationUrl;
     return arguments;
 }
 

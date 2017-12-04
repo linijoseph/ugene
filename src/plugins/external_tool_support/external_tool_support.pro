@@ -198,7 +198,8 @@ HEADERS += src/ETSProjectViewItemsContoller.h \
     src/kraken/KrakenClassifyWorkerFactory.h \
     src/kraken/DatabaseValidator.h \
     src/kraken/DatabaseSizeRelation.h \
-    src/kraken/KrakenTranslateTask.h
+    src/kraken/KrakenTranslateLogParser.h \
+    src/kraken/KrakenClassifyLogParser.h
 
 FORMS += src/blast/FormatDBSupportRunDialog.ui \
          src/blast_plus/AlignToReferenceBlastDialog.ui \
@@ -421,7 +422,8 @@ SOURCES += src/ETSProjectViewItemsContoller.cpp \
     src/kraken/KrakenClassifyWorkerFactory.cpp \
     src/kraken/DatabaseValidator.cpp \
     src/kraken/DatabaseSizeRelation.cpp \
-    src/kraken/KrakenTranslateTask.cpp
+    src/kraken/KrakenTranslateLogParser.cpp \
+    src/kraken/KrakenClassifyLogParser.cpp
 
 RESOURCES += external_tool_support.qrc
 TRANSLATIONS += transl/english.ts \

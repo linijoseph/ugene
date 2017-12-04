@@ -19,9 +19,34 @@
  * MA 02110-1301, USA.
  */
 
-#include "KrakenTranslateTask.h"
+#include "KrakenTranslateLogParser.h"
 
-KrakenTranslateTask::KrakenTranslateTask()
+namespace U2 {
+
+const QStringList KrakenTranslateLogParser::wellKnownErrors = KrakenTranslateLogParser::initWellKnownErrors();
+
+KrakenTranslateLogParser::KrakenTranslateLogParser()
+    : ExternalToolLogParser()
 {
 
 }
+
+bool KrakenTranslateLogParser::isError(const QString &line) const {
+    foreach (const QString &wellKnownError, wellKnownErrors) {
+        if (line.contains(wellKnownError)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+QStringList KrakenTranslateLogParser::initWellKnownErrors() {
+    QStringList result;
+    result << "Must specify DB";
+    result << "unable to find";
+    result << "does not contain necessary file database.kdb";
+
+    return result;
+}
+
+}   // namespace U2

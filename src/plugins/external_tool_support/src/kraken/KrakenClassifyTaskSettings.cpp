@@ -30,7 +30,8 @@ KrakenClassifyTaskSettings::KrakenClassifyTaskSettings()
     : quickOperation(false),
       minNumberOfHits(1),
       numberOfThreads(1),
-      preloadDatabase(true)
+      preloadDatabase(true),
+      pairedReads(false)
 {
 
 }

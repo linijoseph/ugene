@@ -33,14 +33,19 @@ class KrakenClassifyTask : public ExternalToolSupportTask {
 public:
     KrakenClassifyTask(const KrakenClassifyTaskSettings &settings);
 
-    const QString &getReportUrl() const;
+    const QString &getRawClassificationUrl() const;
+    const QString &getTranslatedClassificationUrl() const;
 
 private:
     void prepare();
+    QList<Task *> onSubTaskFinished(Task *subTask);
 
-    QStringList getArguments();
+    QStringList getClassifyArguments();
+    QStringList getTranslateArguments();
 
     const KrakenClassifyTaskSettings settings;
+
+    ExternalToolRunTask *classifyTask;
 };
 
 }   // namespace U2
