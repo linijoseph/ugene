@@ -19,6 +19,8 @@
  * MA 02110-1301, USA.
  */
 
+#include <U2Lang/BaseSlots.h>
+
 #include "KrakenClassifyPrompter.h"
 #include "KrakenClassifyWorkerFactory.h"
 
@@ -33,14 +35,14 @@ KrakenClassifyPrompter::KrakenClassifyPrompter(Actor *actor)
 
 QString KrakenClassifyPrompter::composeRichDoc() {
     IntegralBusPort *input = qobject_cast<IntegralBusPort *>(target->getPort(KrakenClassifyWorkerFactory::INPUT_PORT_ID));
-    Actor *readsProducer = input->getProducer(KrakenClassifyWorkerFactory::INPUT_READS_URL_SLOT_ID);
+    Actor *readsProducer = input->getProducer(BaseSlots::URL_SLOT().getId());
 
     const QString unsetString = "<font color='red'>" + tr("unset") + "</font>";
     const QString readsProducerName = NULL != readsProducer ? readsProducer->getLabel() : unsetString;
 
     const QString databaseUrl = getHyperlink(KrakenClassifyWorkerFactory::DATABASE_ATTR_ID, getURL(KrakenClassifyWorkerFactory::DATABASE_ATTR_ID));
 
-    return tr("Classify sequences from <u>%1</u> with Kraken, use db_name database.").arg(readsProducerName).arg(databaseUrl);
+    return tr("Classify sequences from <u>%1</u> with Kraken, use %2 database.").arg(readsProducerName).arg(databaseUrl);
 }
 
 }   // namespace LocalWorkflow

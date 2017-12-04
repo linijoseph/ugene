@@ -452,6 +452,7 @@ ExternalToolSupportPlugin::ExternalToolSupportPlugin() :
 
     etRegistry->registerEntry(new KrakenSupport(KrakenSupport::BUILD_TOOL));
     etRegistry->registerEntry(new KrakenSupport(KrakenSupport::CLASSIFY_TOOL));
+    etRegistry->registerEntry(new KrakenSupport(KrakenSupport::TRANSLATE_TOOL));
 
     if (AppContext::getMainWindow()) {
         ExternalToolSupportAction* formatDBAction= new ExternalToolSupportAction(tr("BLAST make database..."), this, QStringList(ET_FORMATDB));

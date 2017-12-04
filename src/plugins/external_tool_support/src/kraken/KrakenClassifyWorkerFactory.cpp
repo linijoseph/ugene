@@ -29,6 +29,7 @@
 #include <U2Designer/DelegateEditors.h>
 
 #include <U2Lang/ActorPrototypeRegistry.h>
+#include <U2Lang/BaseSlots.h>
 #include <U2Lang/BaseTypes.h>
 #include <U2Lang/WorkflowEnv.h>
 
@@ -53,7 +54,6 @@ const QString KrakenClassifyWorkerFactory::INPUT_PAIRED_READS_URL_SLOT_ID = "rea
 const QString KrakenClassifyWorkerFactory::OUTPUT_REPORT_URL_SLOT_ID = "classification-url";
 
 const QString KrakenClassifyWorkerFactory::DATABASE_ATTR_ID = "database";
-const QString KrakenClassifyWorkerFactory::TAXONOMY_ATTR_ID = "taxonomy";
 const QString KrakenClassifyWorkerFactory::SEQUENCING_READS_ATTR_ID = "sequencing-reads";
 const QString KrakenClassifyWorkerFactory::QUICK_OPERATION_ATTR_ID = "quick-operation";
 const QString KrakenClassifyWorkerFactory::MIN_HITS_NUMBER_ATTR_ID = "min-hits";
@@ -76,23 +76,21 @@ Worker *KrakenClassifyWorkerFactory::createWorker(Actor *actor) {
 void KrakenClassifyWorkerFactory::init() {
     QList<PortDescriptor *> ports;
     {
-        const Descriptor inReadsUrlSlotDesc(INPUT_READS_URL_SLOT_ID, KrakenClassifyPrompter::tr("Input reads URL"), KrakenClassifyPrompter::tr("Input reads URL."));
-        const Descriptor inPairedReadsUrlSlotDesc(INPUT_PAIRED_PORT_ID, KrakenClassifyPrompter::tr("Input paired reads URL"), KrakenClassifyPrompter::tr("Input paired reads URL."));
-        const Descriptor outReportUrlSlotDesc(OUTPUT_PORT_ID, KrakenClassifyPrompter::tr("Classification report URL"), KrakenClassifyPrompter::tr("Classification report URL."));
-
         QMap<Descriptor, DataTypePtr> inType;
-        inType[inReadsUrlSlotDesc] = BaseTypes::STRING_TYPE();
-        inType[inPairedReadsUrlSlotDesc] = BaseTypes::STRING_TYPE();
+        inType[BaseSlots::URL_SLOT()] = BaseTypes::STRING_TYPE();
+
+        QMap<Descriptor, DataTypePtr> inPairedType;
+        inPairedType[BaseSlots::URL_SLOT()] = BaseTypes::STRING_TYPE();
 
         QMap<Descriptor, DataTypePtr> outType;
-        outType[outReportUrlSlotDesc] = BaseTypes::STRING_TYPE();
+        outType[BaseSlots::URL_SLOT()] = BaseTypes::STRING_TYPE();
 
         const Descriptor inPortDesc(INPUT_PORT_ID, KrakenClassifyPrompter::tr("Input reads URL"), KrakenClassifyPrompter::tr("Input reads URL."));
         const Descriptor inPairedPortDesc(INPUT_PAIRED_PORT_ID, KrakenClassifyPrompter::tr("Input paired reads URL"), KrakenClassifyPrompter::tr("Input paired reads URL."));
         const Descriptor outPortDesc(OUTPUT_PORT_ID, KrakenClassifyPrompter::tr("Classification report URL"), KrakenClassifyPrompter::tr("Classification report URL."));
 
         ports << new PortDescriptor(inPortDesc, DataTypePtr(new MapDataType(ACTOR_ID + "-in", inType)), true /*input*/);
-        ports << new PortDescriptor(inPairedPortDesc, DataTypePtr(new MapDataType(ACTOR_ID + "-in", inType)), true /*input*/);
+        ports << new PortDescriptor(inPairedPortDesc, DataTypePtr(new MapDataType(ACTOR_ID + "paired-in", inPairedType)), true /*input*/);
         ports << new PortDescriptor(outPortDesc, DataTypePtr(new MapDataType(ACTOR_ID + "-out", outType)), false /*input*/, true /*multi*/);
     }
 
@@ -100,10 +98,6 @@ void KrakenClassifyWorkerFactory::init() {
     {
         const Descriptor databaseDesc(DATABASE_ATTR_ID, KrakenClassifyPrompter::tr("Database"),
                                       KrakenClassifyPrompter::tr("A path to the folder with the Kraken database files."));
-
-        const Descriptor taxonomyDesc(TAXONOMY_ATTR_ID, KrakenClassifyPrompter::tr("Taxonomy"),
-                                      KrakenClassifyPrompter::tr("A set of files that define the taxonomic name and tree information, and the GI number to taxon map.\n\n"
-                                                                 "The NCBI taxonomy is used by default."));
 
         const Descriptor sequencingReadsDesc(SEQUENCING_READS_ATTR_ID, KrakenClassifyPrompter::tr("Sequencing reads"),
                                              KrakenClassifyPrompter::tr("Choose between single-end (SE) and paired-end (PE) sequencing.\n\n"
@@ -128,8 +122,6 @@ void KrakenClassifyWorkerFactory::init() {
         Attribute *databaseAttribute =  new Attribute(databaseDesc, BaseTypes::STRING_TYPE(), true);
         attributes << databaseAttribute;
 
-        attributes << new Attribute(taxonomyDesc, BaseTypes::STRING_TYPE(), false);
-
         Attribute *sequencingReadsAttribute = new Attribute(sequencingReadsDesc, BaseTypes::STRING_TYPE(), false, KrakenClassifyTaskSettings::SINGLE_END);
         attributes << sequencingReadsAttribute;
 
@@ -149,10 +141,6 @@ void KrakenClassifyWorkerFactory::init() {
     QMap<QString, PropertyDelegate *> delegates;
     {
         delegates[DATABASE_ATTR_ID] = new URLDelegate("", "kraken/database", false, true, false);
-
-        DelegateTags tags;
-        tags.set(DelegateTags::PLACEHOLDER_TEXT, L10N::defaultStr());
-        delegates[TAXONOMY_ATTR_ID] = new URLDelegate(tags, "kraken/taxonomy", true, false, false);   // TODO
 
         QVariantMap sequencingReadsMap;
         sequencingReadsMap[SINGLE_END_TEXT] = KrakenClassifyTaskSettings::SINGLE_END;
@@ -177,6 +165,7 @@ void KrakenClassifyWorkerFactory::init() {
     proto->setEditor(new DelegateEditor(delegates));
     proto->setPrompter(new KrakenClassifyPrompter(NULL));
     proto->addExternalTool(ET_KRAKEN_CLASSIFY);
+    proto->addExternalTool(ET_KRAKEN_TRANSLATE);
     proto->setValidator(new DatabaseValidator());
     WorkflowEnv::getProtoRegistry()->registerProto(KrakenClassifyPrompter::tr("NGS: Reads Classification"), proto);     // TODO: replace the category name with a constant after extracting to a separate plugin
 

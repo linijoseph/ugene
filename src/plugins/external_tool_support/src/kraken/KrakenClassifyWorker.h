@@ -30,33 +30,32 @@ namespace U2 {
 namespace LocalWorkflow {
 
 class KrakenClassifyWorker : public BaseWorker {
+    Q_OBJECT
 public:
     KrakenClassifyWorker(Actor* actor);
 
     void init();
     Task *tick();
     void cleanup();
+    bool isReady() const;
 
 private slots:
-    void sl_taskFinished();
+    void sl_taskFinished(Task *task);
 
 private:
     bool isReadyToRun() const;
     bool dataFinished() const;
     QString checkPairedReads() const;
 
-    KrakenClassifyTaskSettings getSettings();
+    KrakenClassifyTaskSettings getSettings(U2OpStatus &os);
 
     IntegralBus *input;
     IntegralBus *pairedInput;
     IntegralBus *output;
 
     bool pairedReadsInput;
-    QString datasetName;
 
-    static const QString INPUT_PORT_ID;
-    static const QString PAIRED_INPUT_PORT_ID;
-    static const QString OUTPUT_PORT_ID;
+    static const QString KRAKEN_DIR;
 };
 
 }   // namespace LocalWorkflow

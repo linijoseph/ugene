@@ -51,7 +51,6 @@ public:
     static const QString OUTPUT_REPORT_URL_SLOT_ID;
 
     static const QString DATABASE_ATTR_ID;
-    static const QString TAXONOMY_ATTR_ID;
     static const QString SEQUENCING_READS_ATTR_ID;
     static const QString QUICK_OPERATION_ATTR_ID;
     static const QString MIN_HITS_NUMBER_ATTR_ID;

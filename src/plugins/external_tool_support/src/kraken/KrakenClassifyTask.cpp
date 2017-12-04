@@ -31,7 +31,7 @@
 namespace U2 {
 
 KrakenClassifyTask::KrakenClassifyTask(const KrakenClassifyTaskSettings &settings)
-    : ExternalToolSupportTask(tr("Classify reads with Kraken"), TaskFlags_FOSE_COSC),
+    : ExternalToolSupportTask(tr("Classify reads with Kraken"), TaskFlags_NR_FOSE_COSC),
       settings(settings),
       classifyTask(NULL)
 {
@@ -53,7 +53,7 @@ const QString &KrakenClassifyTask::getTranslatedClassificationUrl() const {
 }
 
 void KrakenClassifyTask::prepare() {
-    classifyTask = new ExternalToolRunTask(ET_KRAKEN_CLASSIFY, getClassifyArguments(), new KrakenClassifyLogParser());
+    classifyTask = new ExternalToolRunTask(KrakenSupport::CLASSIFY_TOOL, getClassifyArguments(), new KrakenClassifyLogParser());
     setListenerForTask(classifyTask);
     addSubTask(classifyTask);
 }

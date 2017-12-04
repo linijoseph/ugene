@@ -20,9 +20,13 @@
  */
 
 #include <U2Core/FailTask.h>
+#include <U2Core/FileAndDirectoryUtils.h>
+#include <U2Core/GUrlUtils.h>
 #include <U2Core/MultiTask.h>
+#include <U2Core/TaskSignalMapper.h>
 #include <U2Core/U2OpStatusUtils.h>
 
+#include <U2Lang/BaseSlots.h>
 #include <U2Lang/WorkflowMonitor.h>
 
 #include "KrakenClassifyTask.h"
@@ -32,12 +36,10 @@
 namespace U2 {
 namespace LocalWorkflow {
 
-const QString KrakenClassifyWorker::INPUT_PORT_ID = "in-port";
-const QString KrakenClassifyWorker::PAIRED_INPUT_PORT_ID = "in-paired-port";
-const QString KrakenClassifyWorker::OUTPUT_PORT_ID = "out-port";
+const QString KrakenClassifyWorker::KRAKEN_DIR = "kraken";
 
 KrakenClassifyWorker::KrakenClassifyWorker(Actor *actor)
-    : BaseWorker(actor),
+    : BaseWorker(actor, false),
       input(NULL),
       pairedInput(NULL),
       output(NULL)
@@ -46,9 +48,13 @@ KrakenClassifyWorker::KrakenClassifyWorker(Actor *actor)
 }
 
 void KrakenClassifyWorker::init() {
-    input = ports.value(INPUT_PORT_ID);
-    pairedInput = ports.value(PAIRED_INPUT_PORT_ID);
-    output = ports.value(OUTPUT_PORT_ID);
+    input = ports.value(KrakenClassifyWorkerFactory::INPUT_PORT_ID);
+    pairedInput = ports.value(KrakenClassifyWorkerFactory::INPUT_PAIRED_PORT_ID);
+    output = ports.value(KrakenClassifyWorkerFactory::OUTPUT_PORT_ID);
+
+    SAFE_POINT(NULL != input, QString("Port with id '%1' is NULL").arg(KrakenClassifyWorkerFactory::INPUT_PORT_ID), );
+    SAFE_POINT(NULL != pairedInput, QString("Port with id '%1' is NULL").arg(KrakenClassifyWorkerFactory::INPUT_PAIRED_PORT_ID), );
+    SAFE_POINT(NULL != output, QString("Port with id '%1' is NULL").arg(KrakenClassifyWorkerFactory::OUTPUT_PORT_ID), );
 
     pairedReadsInput = (getValue<QString>(KrakenClassifyWorkerFactory::SEQUENCING_READS_ATTR_ID) == KrakenClassifyTaskSettings::PAIRED_END);
 
@@ -58,9 +64,15 @@ void KrakenClassifyWorker::init() {
 
 Task *KrakenClassifyWorker::tick() {
     if (isReadyToRun()) {
-        KrakenClassifyTask *task = new KrakenClassifyTask(getSettings());
+        U2OpStatus2Log os;
+        KrakenClassifyTaskSettings settings = getSettings(os);
+        if (os.hasError()) {
+            return new FailTask(os.getError());
+        }
+
+        KrakenClassifyTask *task = new KrakenClassifyTask(settings);
         task->addListeners(createLogListeners(2));
-        connect(task, SIGNAL(si_stateChanged()), SLOT(sl_taskFinished()));
+        connect(new TaskSignalMapper(task), SIGNAL(si_taskFinished(Task *)), SLOT(sl_taskFinished(Task *)));
         return task;
     }
 
@@ -80,22 +92,45 @@ Task *KrakenClassifyWorker::tick() {
 }
 
 void KrakenClassifyWorker::cleanup() {
-    datasetName.clear();
+
 }
 
-void KrakenClassifyWorker::sl_taskFinished() {
-    KrakenClassifyTask *task = qobject_cast<KrakenClassifyTask *>(sender());
-    if (!task->isFinished() || task->hasError() || task->isCanceled()) {
+bool KrakenClassifyWorker::isReady() const {
+    if (isDone()) {
+        return false;
+    }
+
+    const int hasMessage1 = input->hasMessage();
+    const bool ended1 = input->isEnded();
+    if (!pairedReadsInput) {
+        return hasMessage1 || ended1;
+    }
+
+    const int hasMessage2 = pairedInput->hasMessage();
+    const bool ended2 = pairedInput->isEnded();
+
+    if (hasMessage1 && hasMessage2) {
+        return true;
+    } else if (hasMessage1) {
+        return ended2;
+    } else if (hasMessage2) {
+        return ended1;
+    }
+
+    return ended1 && ended2;
+}
+
+void KrakenClassifyWorker::sl_taskFinished(Task *task) {
+    KrakenClassifyTask *krakenTask = qobject_cast<KrakenClassifyTask *>(task);
+    if (!krakenTask->isFinished() || krakenTask->hasError() || krakenTask->isCanceled()) {
         return;
     }
 
-    const QString rawClassificationUrl = task->getRawClassificationUrl();
-    const QString translatedClassificationUrl = task->getTranslatedClassificationUrl();
+    const QString rawClassificationUrl = krakenTask->getRawClassificationUrl();
+    const QString translatedClassificationUrl = krakenTask->getTranslatedClassificationUrl();
 
     QVariantMap data;
-    data[KrakenClassifyWorkerFactory::OUTPUT_REPORT_URL_SLOT_ID] = rawClassificationUrl;
-    output->put(Message(output->getBusType(), data));
-
+    data[BaseSlots::URL_SLOT().getId()] = rawClassificationUrl;
     output->put(Message(output->getBusType(), data));
     context->getMonitor()->addOutputFile(translatedClassificationUrl, getActor()->getId());
 }
@@ -119,7 +154,7 @@ QString KrakenClassifyWorker::checkPairedReads() const {
     return "";
 }
 
-KrakenClassifyTaskSettings KrakenClassifyWorker::getSettings() {
+KrakenClassifyTaskSettings KrakenClassifyWorker::getSettings(U2OpStatus &os) {
     KrakenClassifyTaskSettings settings;
     settings.databaseUrl = getValue<QString>(KrakenClassifyWorkerFactory::DATABASE_ATTR_ID);
     settings.quickOperation = getValue<bool>(KrakenClassifyWorkerFactory::QUICK_OPERATION_ATTR_ID);
@@ -128,12 +163,19 @@ KrakenClassifyTaskSettings KrakenClassifyWorker::getSettings() {
     settings.preloadDatabase = getValue<bool>(KrakenClassifyWorkerFactory::PRELOAD_DATABASE_ATTR_ID);
 
     const Message message = getMessageAndSetupScriptValues(input);
-    settings.readsUrl = message.getData().toString();
+    settings.readsUrl = message.getData().toMap()[BaseSlots::URL_SLOT().getId()].toString();
 
     if (pairedReadsInput) {
+        settings.pairedReads = true;
         const Message pairedMessage = getMessageAndSetupScriptValues(pairedInput);
-        settings.pairedReadsUrl = pairedMessage.getData().toString();
+        settings.pairedReadsUrl = pairedMessage.getData().toMap()[BaseSlots::URL_SLOT().getId()].toString();
     }
+
+    QString tmpDir = FileAndDirectoryUtils::createWorkingDir(context->workingDir(), FileAndDirectoryUtils::WORKFLOW_INTERNAL, "", context->workingDir());
+    tmpDir = GUrlUtils::createDirectory(tmpDir + KRAKEN_DIR , "_", os);
+
+    settings.rawClassificationUrl = tmpDir + "/raw_classification.txt";
+    settings.translatedClassificationUrl = tmpDir + "/translated_classification.txt";
 
     return settings;
 }
