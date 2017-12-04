@@ -45,6 +45,8 @@ QStringList KrakenTranslateLogParser::initWellKnownErrors() {
     result << "Must specify DB";
     result << "unable to find";
     result << "does not contain necessary file database.kdb";
+    result << "No such file or directory";
+    result << "Use of uninitialized value $taxid";
 
     return result;
 }
