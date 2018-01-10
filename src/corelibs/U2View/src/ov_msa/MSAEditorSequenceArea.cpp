@@ -587,7 +587,7 @@ void MSAEditorSequenceArea::sl_saveSequence(){
     }
 
     QObjectScopedPointer<SaveSelectedSequenceFromMSADialogController> d = new SaveSelectedSequenceFromMSADialogController(editor->getMaObject()->getDocument()->getURL().dirPath(),
-        (QWidget*)AppContext::getMainWindow()->getQMainWindow(), seqNames);
+        (QWidget*)AppContext::getMainWindow()->getQMainWindow(), seqNames, editor->getMaObject()->getGObjectName());
     const int rc = d->exec();
     CHECK(!d.isNull(), );
 

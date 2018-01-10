@@ -37,7 +37,7 @@ class SaveDocumentInFolderController;
 class SaveSelectedSequenceFromMSADialogController : public QDialog {
     Q_OBJECT
 public:
-    SaveSelectedSequenceFromMSADialogController(const QString& defaultDir, QWidget* p, const QStringList& seqNames);
+    SaveSelectedSequenceFromMSADialogController(const QString& defaultDir, QWidget* p, const QStringList& seqNames, const QString& defaultCustomFilename);
     ~SaveSelectedSequenceFromMSADialogController();
 
     virtual void accept();
@@ -74,7 +74,6 @@ public:
                             QObject* parent);
 
     QString getSaveDirName() const;
-    //DocumentFormatId getFormatIdToSave() const;
 signals:
     void si_pathChanged(const QString &path);
 private slots:

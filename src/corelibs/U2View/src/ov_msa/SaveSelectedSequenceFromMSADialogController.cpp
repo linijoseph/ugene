@@ -47,7 +47,7 @@ const QString SaveDocumentInFolderController::HOME_DIR_IDENTIFIER = "~/";
 const QString SaveDocumentInFolderController::HOME_DIR_IDENTIFIER = "%UserProfile%/";
 #endif
 
-SaveSelectedSequenceFromMSADialogController::SaveSelectedSequenceFromMSADialogController(const QString &defaultDir, QWidget* p, const QStringList& _seqNames)
+SaveSelectedSequenceFromMSADialogController::SaveSelectedSequenceFromMSADialogController(const QString &defaultDir, QWidget* p, const QStringList& _seqNames, const QString& defaultCustomFilename)
     : QDialog(p),
       defaultDir(defaultDir),
       seqNames(_seqNames),
@@ -64,6 +64,7 @@ SaveSelectedSequenceFromMSADialogController::SaveSelectedSequenceFromMSADialogCo
     ui->fileNameCombo->setCurrentIndex(0);
 
     ui->customFileNameEdit->setDisabled(true);
+    ui->customFileNameEdit->setText(defaultCustomFilename);
 
     connect(ui->fileNameCombo, SIGNAL(currentIndexChanged(int)), SLOT(sl_nameCBIndexChanged(int)));
 
