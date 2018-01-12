@@ -24,20 +24,42 @@
 
 #include <U2Core/Task.h>
 
+#include <U2Core/DNASequence.h>
+
 namespace U2 {
 
-class ExportSequencesTask : public Task {
-public:
-    ExportSequencesTask();
-
-    virtual void init();
-};
+class MultipleSequenceAlignmentObject;
 
 class PrepareSequenceObjectsTask : public Task {
 public:
-    PrepareSequenceObjectsTask();
+    PrepareSequenceObjectsTask(MultipleSequenceAlignmentObject *maObj, const QStringList& seqNames, bool trimGaps);
+
+    virtual void run();
+
+    QList<DNASequence> getSequences();
+private:
+    MultipleSequenceAlignmentObject *maObj;
+    QStringList seqNames;
+    bool trimGaps;
+    QList<DNASequence> sequences;
+};
+
+class ExportSequencesTask : public Task {
+public:
+    ExportSequencesTask(MultipleSequenceAlignmentObject *maObj, const QStringList& seqNames, bool trimGaps, const QString& _url, const QString& _extension, const QString& _customFileName = QString());
 
     virtual void init();
+protected:
+    virtual QList<Task*> onSubTaskFinished(Task* subTask);
+private:
+    MultipleSequenceAlignmentObject *maObj;
+    QStringList seqNames;
+    bool trimGaps;
+    QList<DNASequence> sequences;
+    PrepareSequenceObjectsTask *prepareObjectsTask;
+    QString url;
+    QString extension;
+    QString customFileName;
 };
 
 }
