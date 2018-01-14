@@ -46,7 +46,8 @@ private:
 
 class ExportSequencesTask : public Task {
 public:
-    ExportSequencesTask(MultipleSequenceAlignmentObject *maObj, const QStringList& seqNames, bool trimGaps, const QString& _url, const QString& _extension, const QString& _customFileName = QString());
+    ExportSequencesTask(MultipleSequenceAlignmentObject *maObj, const QStringList& seqNames, bool trimGaps, bool addToProjectFlag, const QString& url, const QString& extension, 
+        const QList<DNASequence>& sequences, const QString& customFileName = QString());
 
     virtual void init();
 protected:
@@ -55,9 +56,11 @@ private:
     MultipleSequenceAlignmentObject *maObj;
     QStringList seqNames;
     bool trimGaps;
+    bool addToProjectFlag;
     QList<DNASequence> sequences;
     PrepareSequenceObjectsTask *prepareObjectsTask;
-    QString url;
+    QString dirUrl;
+    DocumentFormatId format;
     QString extension;
     QString customFileName;
 };

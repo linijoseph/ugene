@@ -119,7 +119,7 @@ Task::ReportResult AddSequenceObjectsToAlignmentTask::report() {
     if (seqListHasEmptySequencesOnly) {
         const NotificationStack *notificationStack = AppContext::getMainWindow()->getNotificationStack();
         CHECK(notificationStack != NULL, ReportResult_Finished);
-        notificationStack->addNotification(tr("Can't insert empty sequence into the alignment."), Warning_Not);
+        //notificationStack->addNotification(tr("Can't insert empty sequence into the alignment."), Warning_Not);
         return ReportResult_Finished;
     }
     
