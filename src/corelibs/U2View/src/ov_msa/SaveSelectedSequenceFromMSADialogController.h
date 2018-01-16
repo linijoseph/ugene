@@ -50,8 +50,6 @@ public:
     bool                trimGapsFlag;
     bool                addToProjectFlag;
 
-private slots:
-    void sl_nameCBIndexChanged(int index);
 private:
     void initSaveController();
 

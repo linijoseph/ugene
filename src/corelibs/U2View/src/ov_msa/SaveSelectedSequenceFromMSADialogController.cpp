@@ -59,14 +59,8 @@ SaveSelectedSequenceFromMSADialogController::SaveSelectedSequenceFromMSADialogCo
     ui->buttonBox->button(QDialogButtonBox::Ok)->setText(tr("Export"));
     ui->buttonBox->button(QDialogButtonBox::Cancel)->setText(tr("Cancel"));
 
-    ui->fileNameCombo->addItem(tr("Sequence name"), QVariant(false));
-    ui->fileNameCombo->addItem(tr("Custom"), QVariant(true));
-    ui->fileNameCombo->setCurrentIndex(0);
-
     ui->customFileNameEdit->setDisabled(true);
     ui->customFileNameEdit->setText(defaultCustomFilename);
-
-    connect(ui->fileNameCombo, SIGNAL(currentIndexChanged(int)), SLOT(sl_nameCBIndexChanged(int)));
 
     trimGapsFlag = false;
     addToProjectFlag = true;
@@ -108,10 +102,6 @@ void SaveSelectedSequenceFromMSADialogController::accept() {
     customFileName = ui->customFileNameEdit->isEnabled() ? ui->customFileNameEdit->text() : "";
 
     QDialog::accept();
-}
-
-void SaveSelectedSequenceFromMSADialogController::sl_nameCBIndexChanged(int index) {
-    ui->customFileNameEdit->setEnabled(ui->fileNameCombo->itemData(index).toBool());
 }
 
 void SaveSelectedSequenceFromMSADialogController::initSaveController() {

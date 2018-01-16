@@ -28,6 +28,7 @@
 #include <U2Core/DocumentSelection.h>
 #include <U2Core/GUrlUtils.h>
 #include <U2Core/IOAdapterUtils.h>
+#include <U2Core/MultiTask.h>
 #include <U2Core/MSAUtils.h>
 #include <U2Core/ProjectModel.h>
 #include <U2Core/SaveDocumentTask.h>
@@ -39,14 +40,14 @@
 
 namespace U2 {
 
-PrepareSequenceObjectsTask::PrepareSequenceObjectsTask(MultipleSequenceAlignmentObject *_maObj, const QStringList& _seqNames, bool _trimGaps) : Task(tr("Prepare sequences"), TaskFlag_None),
-    maObj(_maObj),
-    seqNames(_seqNames),
-    trimGaps(_trimGaps)
+PrepareSequenceObjectsTask::PrepareSequenceObjectsTask(const MultipleSequenceAlignment& msa, const QStringList& seqNames, bool trimGaps) : Task(tr("Prepare sequences"), TaskFlag_None),
+    msa(msa),
+    seqNames(seqNames),
+    trimGaps(trimGaps)
 {}
 
 void PrepareSequenceObjectsTask::run() {
-    foreach(const DNASequence &s, MSAUtils::ma2seq(maObj->getMsa(),trimGaps)) {
+    foreach(const DNASequence &s, MSAUtils::ma2seq(msa,trimGaps)) {
         DNASequence seq;
         if (!seqNames.contains(s.getName())) {
             continue;
@@ -59,14 +60,21 @@ QList<DNASequence> PrepareSequenceObjectsTask::getSequences() {
     return sequences;
 }
 
-ExportSequencesTask::ExportSequencesTask(MultipleSequenceAlignmentObject *_maObj, const QStringList& _seqNames, bool _trimGaps) : Task(tr("Export selected sequences form alignment"), TaskFlags_NR_FOSE_COSC),
-maObj(_maObj),
-seqNames(_seqNames),
-trimGaps(_trimGaps) {}
+ExportSequencesTask::ExportSequencesTask(const MultipleSequenceAlignment& msa, const QStringList& seqNames, bool trimGaps, bool addToProjectFlag,
+    const QString& dirUrl, const DocumentFormatId& format, const QString& extension, const QString& customFileName) : Task(tr("Export selected sequences form alignment"), TaskFlags_NR_FOSE_COSC),
+    msa(msa),
+    seqNames(seqNames),
+    trimGaps(trimGaps),
+    addToProjectFlag(addToProjectFlag),
+    dirUrl(dirUrl),
+    format(format),
+    extension(extension),
+    customFileName(customFileName)
+{}
 
-void ExportSequencesTask::init() {
-    prepareObjectsTask = new PrepareSequenceObjectsTask(maObj, seqNames, trimGaps);
-    AppContext::getTaskScheduler()->registerTopLevelTask(prepareObjectsTask);
+void ExportSequencesTask::prepare() {
+    prepareObjectsTask = new PrepareSequenceObjectsTask(msa, seqNames, trimGaps);
+    addSubTask(prepareObjectsTask);
 }
 
 QList<Task*> ExportSequencesTask::onSubTaskFinished(Task* subTask) {
@@ -77,14 +85,15 @@ QList<Task*> ExportSequencesTask::onSubTaskFinished(Task* subTask) {
         QList<Task*> tasks;
         QSet<QString> existingFilenames;
         foreach(const DNASequence &s, prepareObjectsTask->getSequences()) {
-            QString filePath;
+            QString filename;
             if (customFileName.isEmpty()) {
-                filePath = GUrlUtils::prepareFileLocation(dirUrl + "/" + s.getName() + "." + extension, stateInfo);
+                filename = GUrlUtils::fixFileName(s.getName());
             } else {
-                filePath = GUrlUtils::prepareFileLocation(dirUrl + "/" + customFileName + "." + extension, stateInfo);
+                filename = GUrlUtils::fixFileName(customFileName);
             }
-            CHECK_OP(stateInfo, );
-            GUrlUtils::fixFileName(filePath);
+            QString filePath = GUrlUtils::prepareFileLocation(dirUrl + "/" + filename + "." + extension, stateInfo);
+            CHECK_OP(stateInfo, res);
+
             QFile fileToSave(filePath);
             filePath = GUrlUtils::rollFileName(filePath, "_", existingFilenames);
             existingFilenames.insert(filePath);
@@ -93,9 +102,10 @@ QList<Task*> ExportSequencesTask::onSubTaskFinished(Task* subTask) {
             DocumentFormat *df = AppContext::getDocumentFormatRegistry()->getFormatById(format);
             QList<GObject*> objs;
             Document *doc = df->createNewLoadedDocument(iof, filePath, stateInfo);
-            CHECK_OP_EXT(stateInfo, delete doc, );
+            CHECK_OP_EXT(stateInfo, delete doc, res);
+            DNASequence seq = s;
             U2SequenceObject* seqObj = DocumentFormatUtils::addSequenceObjectDeprecated(doc->getDbiRef(), U2ObjectDbi::ROOT_FOLDER, seq.getName(), objs, seq, stateInfo);
-            CHECK_OP_EXT(stateInfo, delete doc, );
+            CHECK_OP_EXT(stateInfo, delete doc, res);
             doc->addObject(seqObj);
             SaveDocumentTask *t = new SaveDocumentTask(doc, doc->getIOAdapterFactory(), doc->getURL());
 
@@ -104,8 +114,7 @@ QList<Task*> ExportSequencesTask::onSubTaskFinished(Task* subTask) {
                 Document *loadedDoc = p->findDocumentByURL(url);
                 if (loadedDoc) {
                     coreLog.details("The document already in the project");
-                    //QMessageBox::warning(ui, tr("warning"), tr("The document already in the project"));
-                    return;
+                    return res;
                 }
                 p->addDocument(doc);
 
@@ -126,7 +135,7 @@ QList<Task*> ExportSequencesTask::onSubTaskFinished(Task* subTask) {
             }
             tasks.append(t);
         }
-        AppContext::getTaskScheduler()->registerTopLevelTask(new MultiTask(tr("Save sequences from alignment"), tasks));
+        res.append(new MultiTask(tr("Save sequences from alignment"), tasks));
     }
     return res;
 }

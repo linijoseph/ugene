@@ -22,23 +22,21 @@
 #ifndef _U2_EXPORT_SEQUENCES_TASK
 #define _U2_EXPORT_SEQUENCES_TASK
 
-#include <U2Core/Task.h>
-
 #include <U2Core/DNASequence.h>
+#include <U2Core/MultipleSequenceAlignment.h>
+#include <U2Core/Task.h>
 
 namespace U2 {
 
-class MultipleSequenceAlignmentObject;
-
 class PrepareSequenceObjectsTask : public Task {
 public:
-    PrepareSequenceObjectsTask(MultipleSequenceAlignmentObject *maObj, const QStringList& seqNames, bool trimGaps);
+    PrepareSequenceObjectsTask(const MultipleSequenceAlignment& msa, const QStringList& seqNames, bool trimGaps);
 
-    virtual void run();
+    void run();
 
     QList<DNASequence> getSequences();
 private:
-    MultipleSequenceAlignmentObject *maObj;
+    const MultipleSequenceAlignment msa;
     QStringList seqNames;
     bool trimGaps;
     QList<DNASequence> sequences;
@@ -46,23 +44,22 @@ private:
 
 class ExportSequencesTask : public Task {
 public:
-    ExportSequencesTask(MultipleSequenceAlignmentObject *maObj, const QStringList& seqNames, bool trimGaps, bool addToProjectFlag, const QString& url, const QString& extension, 
-        const QList<DNASequence>& sequences, const QString& customFileName = QString());
+    ExportSequencesTask(const MultipleSequenceAlignment& msa, const QStringList& seqNames, bool trimGaps, bool addToProjectFlag,
+        const QString& dirUrl, const DocumentFormatId& format, const QString& extension, const QString& customFileName = QString());
 
-    virtual void init();
+    void prepare();
 protected:
-    virtual QList<Task*> onSubTaskFinished(Task* subTask);
+    QList<Task*> onSubTaskFinished(Task* subTask);
 private:
-    MultipleSequenceAlignmentObject *maObj;
+    const MultipleSequenceAlignment msa;
     QStringList seqNames;
     bool trimGaps;
     bool addToProjectFlag;
-    QList<DNASequence> sequences;
-    PrepareSequenceObjectsTask *prepareObjectsTask;
     QString dirUrl;
     DocumentFormatId format;
     QString extension;
     QString customFileName;
+    PrepareSequenceObjectsTask *prepareObjectsTask;
 };
 
 }
