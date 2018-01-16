@@ -34,7 +34,7 @@ public:
 
     void run();
 
-    QList<DNASequence> getSequences();
+    QList<DNASequence> getSequences() const;
 private:
     const MultipleSequenceAlignment msa;
     QStringList seqNames;

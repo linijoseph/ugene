@@ -595,11 +595,11 @@ void MSAEditorSequenceArea::sl_saveSequence(){
     if (rc == QDialog::Rejected) {
         return;
     }
-    DocumentFormat *df = AppContext::getDocumentFormatRegistry()->getFormatById(d->format);
+    DocumentFormat *df = AppContext::getDocumentFormatRegistry()->getFormatById(d->getFormat());
     SAFE_POINT(df != NULL, "Unknown document format", );
     QString extension = df->getSupportedDocumentFileExtensions().first();
 
-    AppContext::getTaskScheduler()->registerTopLevelTask(new ExportSequencesTask(getEditor()->getMaObject()->getMsa(), seqNames, d->trimGapsFlag, d->addToProjectFlag, d->url, d->format, extension, d->customFileName));
+    AppContext::getTaskScheduler()->registerTopLevelTask(new ExportSequencesTask(getEditor()->getMaObject()->getMsa(), seqNames, d->getTrimGapsFlag(), d->getAddToProjectFlag(), d->getUrl(), d->getFormat(), extension, d->getCustomFileName()));
 }
 
 void MSAEditorSequenceArea::sl_modelChanged() {

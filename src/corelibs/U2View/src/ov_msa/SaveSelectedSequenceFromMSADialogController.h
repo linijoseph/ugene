@@ -42,6 +42,14 @@ public:
 
     virtual void accept();
 
+    QString getUrl() const;
+    DocumentFormatId getFormat() const;
+    QString getCustomFileName() const;
+    bool getTrimGapsFlag() const;
+    bool getAddToProjectFlag() const;
+private:
+    void initSaveController();
+
     QString             url;
     QString             defaultDir;
     DocumentFormatId    format;
@@ -49,10 +57,6 @@ public:
     QString             customFileName;
     bool                trimGapsFlag;
     bool                addToProjectFlag;
-
-private:
-    void initSaveController();
-
     SaveDocumentInFolderController* saveController;
     Ui_SaveSelectedSequenceFromMSADialog* ui;
 };

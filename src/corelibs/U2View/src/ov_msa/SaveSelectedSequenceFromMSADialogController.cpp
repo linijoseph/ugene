@@ -104,6 +104,28 @@ void SaveSelectedSequenceFromMSADialogController::accept() {
     QDialog::accept();
 }
 
+
+
+QString SaveSelectedSequenceFromMSADialogController::getUrl() const {
+    return url;
+}
+
+DocumentFormatId SaveSelectedSequenceFromMSADialogController::getFormat() const {
+    return format;
+}
+
+QString SaveSelectedSequenceFromMSADialogController::getCustomFileName() const {
+    return customFileName;
+}
+
+bool SaveSelectedSequenceFromMSADialogController::getTrimGapsFlag() const {
+    return trimGapsFlag;
+}
+
+bool SaveSelectedSequenceFromMSADialogController::getAddToProjectFlag() const {
+    return addToProjectFlag;
+}
+
 void SaveSelectedSequenceFromMSADialogController::initSaveController() {
     SaveDocumentInFolderControllerConfig config;
     config.defaultFormatId = BaseDocumentFormats::FASTA;
@@ -197,11 +219,5 @@ QString SaveDocumentInFolderController::getSaveDirName() const {
     }
     return filePath;
 }
-/*
-DocumentFormatId SaveDocumentInFolderController::getFormatIdToSave() const {
-    const QString currentFormat = (conf.formatCombo->currentData()).toString();
-    SAFE_POINT(!currentFormat.isEmpty(), "Current format is not set", DocumentFormatId::null);
-    return formatsInfo.getIdByName(currentFormat);
-}
-*/
+
 }
