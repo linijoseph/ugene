@@ -134,6 +134,7 @@ private slots:
 
     void sl_itemEntered(QTreeWidgetItem *i, int column);
     void sl_itemClicked(QTreeWidgetItem *item, int column);
+    void sl_itemPressed(QTreeWidgetItem *item, int column);
     void sl_itemDoubleClicked (QTreeWidgetItem *item, int column);
     void sl_itemExpanded(QTreeWidgetItem *);
 
@@ -204,6 +205,8 @@ private:
     QTimer              sortTimer;
     QPoint              dragStartPos;
     QMenu*              highlightAutoAnnotationsMenu;
+    QList<Annotation*>  wideSelection;
+    QList<Annotation*>  dashedSelection;
     // drag&drop related data
     bool                isDragging;
     bool                dndCopyOnly;

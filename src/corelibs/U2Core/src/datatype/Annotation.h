@@ -58,6 +58,8 @@ public:
 
     bool                            isBond() const;
 
+    bool                            isOnlyAnnotationSelected() const;
+
     U2Strand                        getStrand() const;
 
     void                            setStrand(const U2Strand &strand);
@@ -69,6 +71,8 @@ public:
     U2Location                      getLocation() const;
 
     void                            setLocation(const U2Location &location);
+
+    void                            setOnlyAnnotationSelected(const bool state);
 
     QVector<U2Region>               getRegions() const;
     /**

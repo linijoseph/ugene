@@ -105,6 +105,7 @@ public:
 
 signals:
     void si_selectionChanged(AnnotationSelection *thiz, const QList<Annotation *> &added, const QList<Annotation *> &removed);
+    void si_update();
 
 private:
     QList<AnnotationSelectionData> selection;

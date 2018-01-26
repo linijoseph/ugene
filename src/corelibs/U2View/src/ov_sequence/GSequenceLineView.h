@@ -144,6 +144,7 @@ protected slots:
     virtual void sl_onScrollBarMoved(int pos);
     virtual void sl_onDNASelectionChanged(LRegionsSelection* thiz, const QVector<U2Region>& added, const QVector<U2Region>& removed);
     virtual void sl_sequenceChanged();
+    virtual void sl_update();
     void sl_onFrameRangeChanged();
     void sl_onCoherentRangeViewRangeChanged();
     void completeUpdate();

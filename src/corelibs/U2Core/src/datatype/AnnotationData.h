@@ -62,6 +62,7 @@ public:
     U2Location              location;
     QVector<U2Qualifier>    qualifiers;
     bool                    caseAnnotation;
+    bool                    onlyAnnotationSelected;
     U2FeatureType           type;
 };
 

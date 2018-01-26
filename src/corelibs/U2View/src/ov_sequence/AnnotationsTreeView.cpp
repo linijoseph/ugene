@@ -132,6 +132,7 @@ AnnotationsTreeView::AnnotationsTreeView(AnnotatedDNAView* _ctx) : ctx(_ctx), dn
 
     connect(tree, SIGNAL(itemEntered(QTreeWidgetItem*, int)), SLOT(sl_itemEntered(QTreeWidgetItem*, int)));
     connect(tree, SIGNAL(itemClicked(QTreeWidgetItem*, int)), SLOT(sl_itemClicked(QTreeWidgetItem*, int)));
+    connect(tree, SIGNAL(itemPressed(QTreeWidgetItem*, int)), SLOT(sl_itemPressed(QTreeWidgetItem*, int)));
     connect(tree, SIGNAL(itemDoubleClicked(QTreeWidgetItem*, int)), SLOT(sl_itemDoubleClicked(QTreeWidgetItem*, int)));
     connect(tree, SIGNAL(itemExpanded(QTreeWidgetItem*)), SLOT(sl_itemExpanded(QTreeWidgetItem*)));
 
@@ -370,12 +371,14 @@ void AnnotationsTreeView::sl_onItemSelectionChanged() {
 
 
     QList<QTreeWidgetItem*> items = tree->selectedItems();
+    bool isSelectionClear = true;
     foreach (QTreeWidgetItem* i, items) {
         AVItem* item  = static_cast<AVItem*>(i);
         if (item->type == AVItemType_Annotation) {
             AVAnnotationItem* aItem = static_cast<AVAnnotationItem*>(item);
             SAFE_POINT(NULL != aItem->annotation->getGObject(), "Invalid annotation table!",);
             as->addToSelection(aItem->annotation);
+            isSelectionClear = false;
         } else if (item->type == AVItemType_Group) {
             AVGroupItem* gItem = static_cast<AVGroupItem*>(item);
             ags->addToSelection(gItem->group);
@@ -1554,6 +1557,24 @@ void AnnotationsTreeView::sl_itemEntered(QTreeWidgetItem * i, int column) {
 
 void AnnotationsTreeView::sl_itemDoubleClicked(QTreeWidgetItem *i, int) {
     AVItem* item = static_cast<AVItem*>(i);
+
+    if (item->type == AVItemType_Annotation) {
+        AnnotationSelection* as = ctx->getAnnotationsSelection();
+        //QList<AnnotationSelectionData> annotationSelDatas = as->getSelection();
+        //foreach(AnnotationSelectionData data, annotationSelDatas) {
+        //    if (!data.annotation->isOnlyAnnotationSelected()) {
+        //        data.annotation->setOnlyAnnotationSelected(false);
+        //    }
+        //}
+
+        AVAnnotationItem* aItem = static_cast<AVAnnotationItem*>(i);
+        aItem->annotation->setOnlyAnnotationSelected(false);
+        wideSelection.removeOne(aItem->annotation);
+        dashedSelection.append(aItem->annotation);
+
+        as->si_selectionChanged(as, QList<Annotation*>() << aItem->annotation, QList<Annotation*>());
+    }
+
     if (item->type == AVItemType_Qualifier) {
         AVQualifierItem *qi = static_cast<AVQualifierItem *>(item);
         editQualifierItem(qi);
@@ -1562,6 +1583,7 @@ void AnnotationsTreeView::sl_itemDoubleClicked(QTreeWidgetItem *i, int) {
 
 void AnnotationsTreeView::sl_itemClicked(QTreeWidgetItem *i, int column) {
     AVItem *item = static_cast<AVItem *>(i);
+
     if (lastMB != Qt::LeftButton || item==NULL || !item->isColumnLinked(column)) {
         return;
     }
@@ -1574,7 +1596,36 @@ void AnnotationsTreeView::sl_itemClicked(QTreeWidgetItem *i, int column) {
     }
 }
 
+void AnnotationsTreeView::sl_itemPressed(QTreeWidgetItem *i, int column) {
+    AVItem *item = static_cast<AVItem *>(i);
+    if (item->type == AVItemType_Annotation) {
+        QList<Annotation*> allAnns = item->getAnnotationTableObject()->getAnnotations();
+        AnnotationSelection* as = ctx->getAnnotationsSelection();
+        QList<AnnotationSelectionData> annotationSelDatas = as->getSelection();
+
+        foreach(Annotation* ann, wideSelection) {
+            ann->setOnlyAnnotationSelected(false);
+        }
+        wideSelection.clear();
+
+        foreach(AnnotationSelectionData data, annotationSelDatas) {
+            if (!wideSelection.contains(data.annotation)) {
+                wideSelection.append(data.annotation);
+                data.annotation->setOnlyAnnotationSelected(true);
+            }
+
+            if (dashedSelection.contains(data.annotation)) {
+                dashedSelection.removeOne(data.annotation);
+                as->si_selectionChanged(as, QList<Annotation*>(), QList<Annotation*>() << data.annotation);
+            }
+        }
+
+        as->si_update();
+    }
+}
+
 void AnnotationsTreeView::sl_itemExpanded(QTreeWidgetItem *qi) {
+    return;
     AVItem *i = static_cast<AVItem *>(qi);
     if (i->type != AVItemType_Annotation) {
         return;

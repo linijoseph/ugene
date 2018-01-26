@@ -612,11 +612,11 @@ void PanViewRenderArea::drawAll(QPaintDevice* pd) {
                           uf.testFlag(GSLV_UF_VisibleRangeChanged) || uf.testFlag(GSLV_UF_AnnotationsChanged);
 
     QPainter p(pd);
-    if (completeRedraw) {
+    //if (completeRedraw) {
         QPainter pCached(cachedView);
         renderer->drawAll(pCached, QSize(pd->width(), pd->height()), view->getVisibleRange());
         pCached.end();
-    }
+    //}
 
     p.drawPixmap(0, 0, *cachedView);
 

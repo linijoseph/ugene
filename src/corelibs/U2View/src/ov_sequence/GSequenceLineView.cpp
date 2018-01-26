@@ -500,6 +500,10 @@ void GSequenceLineView::sl_sequenceChanged(){
     completeUpdate();
 }
 
+void GSequenceLineView::sl_update() {
+    update();
+}
+
 void GSequenceLineView::moveBorder(const QPoint& p) {
     QPoint areaPoint = toRenderAreaPoint(p);
     autoScrolling(areaPoint);

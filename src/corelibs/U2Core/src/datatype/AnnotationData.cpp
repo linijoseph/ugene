@@ -26,7 +26,7 @@
 namespace U2 {
 
 AnnotationData::AnnotationData()
-    : location(new U2LocationData()), caseAnnotation(false), type(U2FeatureTypes::MiscFeature)
+    : location(new U2LocationData()), caseAnnotation(false), onlyAnnotationSelected(false), type(U2FeatureTypes::MiscFeature)
 {
 
 }

@@ -106,6 +106,10 @@ bool Annotation::isBond() const {
     return data->isBond();
 }
 
+bool Annotation::isOnlyAnnotationSelected() const {
+    return data->onlyAnnotationSelected;
+}
+
 U2Strand Annotation::getStrand() const {
     return data->getStrand();
 }
@@ -165,6 +169,11 @@ void Annotation::setLocation(const U2Location &location) {
     AnnotationModification md(AnnotationModification_LocationChanged, this);
     parentObject->emit_onAnnotationModified(md);
 }
+
+void Annotation::setOnlyAnnotationSelected(const bool state) {
+    data->onlyAnnotationSelected = state;
+}
+
 
 QVector<U2Region> Annotation::getRegions() const {
     return data->getRegions();

@@ -155,7 +155,9 @@ void SequenceViewAnnotatedRenderer::drawAnnotation(QPainter &p, const QSize& can
         }
 
         rectPath.setFillRule(Qt::WindingFill);
-        p.fillPath(rectPath, as->color);
+        if (!a->isOnlyAnnotationSelected()) {
+            p.fillPath(rectPath, as->color);
+        }
         p.fillPath(rectPath, annMetrics.gradientMaskBrush);
 
         p.setPen(borderPen);
