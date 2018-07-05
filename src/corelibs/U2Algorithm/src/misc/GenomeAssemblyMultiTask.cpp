@@ -104,9 +104,16 @@ QString GenomeAssemblyMultiTask::generateReport() const {
     return res;
 }
 
-QString GenomeAssemblyMultiTask::getResultUrl() const{
+QString GenomeAssemblyMultiTask::getResultUrl() const {
     if(assemblyTask && assemblyTask->isFinished() && !assemblyTask->hasError()){
         return assemblyTask->getResultUrl();
+    }
+    return "";
+}
+
+QString GenomeAssemblyMultiTask::getContigsUrl() const {
+    if (assemblyTask && assemblyTask->isFinished() && !assemblyTask->hasError()) {
+        return assemblyTask->getContigsUrl();
     }
     return "";
 }

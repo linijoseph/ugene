@@ -24,11 +24,15 @@
 namespace U2 {
 
 GenomeAssemblyTask::GenomeAssemblyTask( const GenomeAssemblyTaskSettings& s, TaskFlags _flags)
-    : Task("GenomeAssemblyTask", _flags), settings(s), resultUrl("˚"){
+    : Task("GenomeAssemblyTask", _flags), settings(s), resultUrl(""){
 }
 
 QString GenomeAssemblyTask::getResultUrl() const{
     return resultUrl;
+}
+
+QString GenomeAssemblyTask::getContigsUrl() const {
+    return contigsUrl;
 }
 
 QVariant GenomeAssemblyTaskSettings::getCustomValue( const QString& optionName, const QVariant& defaultVal ) const {
