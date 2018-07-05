@@ -39,6 +39,7 @@ public:
     virtual ReportResult report();
     virtual QString generateReport() const;
     QString getResultUrl() const;
+    QString getContigsUrl() const;
     QList<Task*> onSubTaskFinished(Task* subTask);
     const GenomeAssemblyTaskSettings& getSettings() const {return settings;}
 private:

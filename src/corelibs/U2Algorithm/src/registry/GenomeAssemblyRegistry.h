@@ -123,11 +123,13 @@ public:
     virtual ~GenomeAssemblyTask() {}
     bool hasResult() const {return !resultUrl.isEmpty();}
     QString getResultUrl() const;
+    QString getContigsUrl() const;
     const GenomeAssemblyTaskSettings& getSettings() const{return settings;}
 
 protected:
     GenomeAssemblyTaskSettings settings;
     QString resultUrl;
+    QString contigsUrl;
 };
 
 class U2ALGORITHM_EXPORT GenomeAssemblyTaskFactory {
