@@ -90,6 +90,10 @@ QList<Task*> GenomeAssemblyMultiTask::onSubTaskFinished( Task* subTask ) {
 }
 
 
+U2::GenomeAssemblyTask* GenomeAssemblyMultiTask::getAssemblyTask() const {
+    return assemblyTask;
+}
+
 QString GenomeAssemblyMultiTask::generateReport() const {
     QString res;
     if (hasError()) {
@@ -110,14 +114,5 @@ QString GenomeAssemblyMultiTask::getResultUrl() const {
     }
     return "";
 }
-
-QString GenomeAssemblyMultiTask::getContigsUrl() const {
-    if (assemblyTask && assemblyTask->isFinished() && !assemblyTask->hasError()) {
-        return assemblyTask->getContigsUrl();
-    }
-    return "";
-}
-
-
 
 } // namespace
