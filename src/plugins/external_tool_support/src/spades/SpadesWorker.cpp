@@ -136,7 +136,8 @@ void SpadesWorker::sl_taskFinished() {
 
 
      QString scaffoldUrl = t->getResultUrl();
-     QString contigsUrl = t->getContigsUrl();
+     SpadesTask *spadesTask = qobject_cast<SpadesTask*>(t->getAssemblyTask());
+     QString contigsUrl = spadesTask->getContigsUrl();
 
      QVariantMap data;
      data[SCAFFOLD_OUT_SLOT_ID] =  qVariantFromValue<QString>(scaffoldUrl);
@@ -157,9 +158,10 @@ GenomeAssemblyTaskSettings SpadesWorker::getSettings( U2OpStatus &os ){
 
     settings.algName = ET_SPADES;
     settings.openView = false;
+    QString outputDir = GUrlUtils::rollFileName(getValue<QString>(OUTPUT_DIR), "_");
 
     QString outDir = GUrlUtils::createDirectory(
-        getValue<QString>(OUTPUT_DIR) + "/" + BASE_SPADES_SUBDIR,
+         outputDir + "/" + BASE_SPADES_SUBDIR,
         "_", os);
     CHECK_OP(os, settings);
 
@@ -309,9 +311,7 @@ void SpadesWorkerFactory::init() {
      {
          DelegateTags outputUrlTags;
          outputUrlTags.set(DelegateTags::PLACEHOLDER_TEXT, "Auto");
-         outputUrlTags.set(DelegateTags::FILTER, DialogUtils::prepareDocumentsFileFilter(BaseDocumentFormats::PLAIN_TEXT, true, QStringList()));
-         outputUrlTags.set(DelegateTags::FORMAT, BaseDocumentFormats::PLAIN_TEXT);
-         delegates[OUTPUT_DIR] = new URLDelegate(outputUrlTags, "spades/output");
+         delegates[OUTPUT_DIR] = new URLDelegate(outputUrlTags, "spades/output", false, true);
 
          QVariantMap spinMap; spinMap["minimum"] = QVariant(1); spinMap["maximum"] = QVariant(INT_MAX);
          delegates[SpadesTask::OPTION_THREADS]  = new SpinBoxDelegate(spinMap);
