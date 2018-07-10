@@ -134,7 +134,6 @@ void SpadesWorker::sl_taskFinished() {
         return;
     }
 
-
      QString scaffoldUrl = t->getResultUrl();
      SpadesTask *spadesTask = qobject_cast<SpadesTask*>(t->getAssemblyTask());
      QString contigsUrl = spadesTask->getContigsUrl();
