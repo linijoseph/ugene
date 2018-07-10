@@ -157,7 +157,11 @@ GenomeAssemblyTaskSettings SpadesWorker::getSettings( U2OpStatus &os ){
 
     settings.algName = ET_SPADES;
     settings.openView = false;
-    QString outputDir = GUrlUtils::rollFileName(getValue<QString>(OUTPUT_DIR), "_");
+    QString outDirValue = getValue<QString>(OUTPUT_DIR);
+    if (outDirValue.isEmpty()) {
+        outDirValue = context->workingDir();
+    }
+    QString outputDir = GUrlUtils::rollFileName(outDirValue, "_");
 
     QString outDir = GUrlUtils::createDirectory(
          outputDir + "/" + BASE_SPADES_SUBDIR,
@@ -302,7 +306,7 @@ void SpadesWorkerFactory::init() {
 
         attrs << new Attribute(threads, BaseTypes::NUM_TYPE(), false, QVariant(16));
         attrs << new Attribute(memLim, BaseTypes::NUM_TYPE(), false, QVariant(250));
-        attrs << new Attribute(outDir, BaseTypes::STRING_TYPE(), true);
+        attrs << new Attribute(outDir, BaseTypes::STRING_TYPE(), Attribute::CanBeEmpty | Attribute::Required);
 
      }
 
