@@ -31,10 +31,6 @@ QString GenomeAssemblyTask::getResultUrl() const{
     return resultUrl;
 }
 
-QString GenomeAssemblyTask::getContigsUrl() const {
-    return contigsUrl;
-}
-
 QVariant GenomeAssemblyTaskSettings::getCustomValue( const QString& optionName, const QVariant& defaultVal ) const {
     if (customSettings.contains(optionName)) {
         return customSettings.value(optionName);

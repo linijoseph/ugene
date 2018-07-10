@@ -136,6 +136,7 @@ void SpadesWorker::sl_taskFinished() {
 
      QString scaffoldUrl = t->getResultUrl();
      SpadesTask *spadesTask = qobject_cast<SpadesTask*>(t->getAssemblyTask());
+     CHECK(spadesTask != NULL, );
      QString contigsUrl = spadesTask->getContigsUrl();
 
      QVariantMap data;
@@ -162,12 +163,11 @@ GenomeAssemblyTaskSettings SpadesWorker::getSettings( U2OpStatus &os ){
         outDir = context->workingDir();
     } else {
         outDir = GUrlUtils::rollFileName(outDir, "_");
+        outDir = GUrlUtils::createDirectory(
+             outDir + "/" + BASE_SPADES_SUBDIR,
+            "_", os);
+        CHECK_OP(os, settings);
     }
-
-    outDir = GUrlUtils::createDirectory(
-         outDir + "/" + BASE_SPADES_SUBDIR,
-        "_", os);
-    CHECK_OP(os, settings);
 
     if (outDir.endsWith("/")){
         outDir.chop(1);

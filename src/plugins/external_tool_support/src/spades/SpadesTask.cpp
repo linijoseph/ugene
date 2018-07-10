@@ -115,18 +115,22 @@ Task::ReportResult SpadesTask::report() {
     if(!FileAndDirectoryUtils::isFileEmpty(res)){
         resultUrl = res;
     }else{
-        stateInfo.setError(QString("File %1 has not been found in output folder %2").arg(SpadesTask::SCAFFOLDS_NAME).arg(settings.outDir.getURLString()));
+        stateInfo.setError(tr("File %1 has not been found in output folder %2").arg(SpadesTask::SCAFFOLDS_NAME).arg(settings.outDir.getURLString()));
     }
 
     QString contigs = settings.outDir.getURLString() + "/" + SpadesTask::CONTIGS_NAME;
     if (!FileAndDirectoryUtils::isFileEmpty(res)) {
         contigsUrl = contigs;
     } else {
-        stateInfo.setError(QString("File %1 has not been found in output folder %2").arg(SpadesTask::CONTIGS_NAME).arg(settings.outDir.getURLString()));
+        stateInfo.setError(tr("File %1 has not been found in output folder %2").arg(SpadesTask::CONTIGS_NAME).arg(settings.outDir.getURLString()));
     }
 
 
     return ReportResult_Finished;
+}
+
+QString SpadesTask::getScaffoldsUrl() const {
+    return resultUrl;
 }
 
 QString SpadesTask::getContigsUrl() const {
@@ -134,9 +138,7 @@ QString SpadesTask::getContigsUrl() const {
 }
 
 QList<Task *> SpadesTask::onSubTaskFinished(Task * /*subTask*/) {
-
     QList<Task *> result;
-
     return result;
 }
 
