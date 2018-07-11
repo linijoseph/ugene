@@ -160,9 +160,8 @@ GenomeAssemblyTaskSettings SpadesWorker::getSettings( U2OpStatus &os ){
     settings.openView = false;
     QString outDir = getValue<QString>(OUTPUT_DIR);
     if (outDir.isEmpty()) {
-        outDir = context->workingDir();
+        outDir = context->workingDir() + "/run/" + BASE_SPADES_SUBDIR;
     } else {
-        outDir = GUrlUtils::rollFileName(outDir, "_");
         outDir = GUrlUtils::createDirectory(
              outDir + "/" + BASE_SPADES_SUBDIR,
             "_", os);
