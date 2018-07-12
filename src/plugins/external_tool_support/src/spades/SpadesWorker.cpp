@@ -163,7 +163,6 @@ GenomeAssemblyTaskSettings SpadesWorker::getSettings( U2OpStatus &os ){
     if (outDir.isEmpty()) {
         outDir = FileAndDirectoryUtils::createWorkingDir(context->workingDir(), FileAndDirectoryUtils::WORKFLOW_INTERNAL, "", context->workingDir());
     } else {
-        outDir = GUrlUtils::rollFileName(outDir, "_");
     }
     outDir = GUrlUtils::createDirectory(outDir + BASE_SPADES_SUBDIR, "_", os);
     CHECK_OP(os, settings);
