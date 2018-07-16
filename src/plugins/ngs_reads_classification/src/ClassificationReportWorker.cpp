@@ -330,6 +330,9 @@ static void fill(QHash<TaxID, uint> &claded, QHash<TaxID, ClassificationReportLi
 
     QString rank = line.rank = tree->getRank(id);
     QString name = line.tax_name = tree->getName(id);
+    if (name.isEmpty()) {
+        name = "-";
+    }
 
     do {
         claded[id] += line.directly_num;
