@@ -408,13 +408,12 @@ void LoadDataFromEntrezTask::run( )
     stateInfo.progress = 0;
     ioLog.trace( "Load data from Entrez started..." );
 
-    ioLog.trace( "Downloading file..." );
     // Step one: download the file
     QString traceFetchUrl = QString( EntrezUtils::NCBI_EFETCH_URL ).arg( db ).arg( accNumber ).arg( format );
 
     createLoopAndNetworkManager(traceFetchUrl);
 
-    ioLog.trace( traceFetchUrl );
+    ioLog.info(tr("Downloading file %1").arg(traceFetchUrl));
     QUrl requestUrl(EntrezUtils::NCBI_EFETCH_URL.arg(db).arg(accNumber).arg(format));
     downloadReply = networkManager->get( QNetworkRequest( requestUrl ) );
     connect( downloadReply, SIGNAL( error( QNetworkReply::NetworkError ) ),
@@ -662,7 +661,7 @@ RemoteDBRegistry::RemoteDBRegistry() {
         }
     }
 
-    hints.insert(ENSEMBL, QObject::tr("Use Ensembl ID. For example: %1 or %2").arg(makeIDLink("ENSG00000258664")).arg(makeIDLink("ENSG00000146463")));
+    hints.insert(ENSEMBL, QObject::tr("Use Ensembl ID. For example: %1 or %2").arg(makeIDLink("ENSG00000205571")).arg(makeIDLink("ENSG00000146463")));
     hints.insert(GENBANK_DNA, QObject::tr("Use Genbank DNA accession number. For example: %1 or %2").arg(makeIDLink("NC_001363")).arg(makeIDLink("D11266")));
     hints.insert(GENBANK_PROTEIN, QObject::tr("Use Genbank protein accession number. For example: %1").arg(makeIDLink("AAA59172.1")));
     hints.insert(PDB, QObject::tr("Use PDB molecule four-letter identifier. For example: %1 or %2").arg(makeIDLink("3INS")).arg(makeIDLink("1CRN")));
