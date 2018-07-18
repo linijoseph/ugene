@@ -124,7 +124,7 @@ bool HttpFileAdapter::open( const QUrl& url, const QNetworkProxy & p)
         QNetworkRequest netRequest(urlString);
         reply = netManager->get(netRequest);
     }
-    coreLog.info(tr("Downloading from %1").arg(reply->url().toString()));
+    coreLog.details(tr("Downloading from %1").arg(reply->url().toString()));
     connect( reply, SIGNAL(readyRead()), this, SLOT(add_data()), Qt::DirectConnection );
     connect( reply, SIGNAL(downloadProgress(qint64,qint64)), this, SLOT(progress(qint64,qint64)), Qt::DirectConnection );//+
     connect( reply, SIGNAL(finished()), this, SLOT(done()), Qt::DirectConnection );
@@ -319,20 +319,18 @@ qint64 HttpFileAdapter::waitData( qint64 until )
 
 void HttpFileAdapter::done()
 {
-    bool isLocHeader = reply->hasRawHeader("Location");
-    QVariant loc = reply->header(QNetworkRequest::KnownHeaders::LocationHeader);
-    QString locationHeaderValue = reply->header(QNetworkRequest::KnownHeaders::LocationHeader).toString();
+    QString locationHeaderValue = reply->header(QNetworkRequest::LocationHeader).toString();
     if (!locationHeaderValue.isEmpty()) {
-        QUrl redirectedUrl(reply->url());
-        redirectedUrl.setUrl(reply->attribute(QNetworkRequest::RedirectionTargetAttribute).toString());
+        QUrl redirectedUrl(locationHeaderValue);
         chunk_list.clear();
         close();
-        coreLog.info(tr("Redirecting to %1").arg(redirectedUrl.url()));
+        coreLog.details(tr("Redirecting to %1").arg(redirectedUrl.url()));
         open(redirectedUrl, netManager->proxy());
-    } else {
-        is_downloaded = true;
-        badstate = (reply->error() != QNetworkReply::NoError);
+        return;
     }
+    is_downloaded = true;
+    badstate = (reply->error() != QNetworkReply::NoError);
+
     loop.exit();
 }
 

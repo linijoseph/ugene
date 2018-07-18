@@ -413,15 +413,9 @@ void LoadDataFromEntrezTask::run( )
 
     createLoopAndNetworkManager(traceFetchUrl);
 
-    ioLog.info(tr("Downloading file %1").arg(traceFetchUrl));
+    ioLog.details(tr("Downloading file %1").arg(traceFetchUrl));
     QUrl requestUrl(EntrezUtils::NCBI_EFETCH_URL.arg(db).arg(accNumber).arg(format));
-    downloadReply = networkManager->get( QNetworkRequest( requestUrl ) );
-    connect( downloadReply, SIGNAL( error( QNetworkReply::NetworkError ) ),
-        this, SLOT( sl_onError( QNetworkReply::NetworkError ) ) );
-    connect( downloadReply, SIGNAL(uploadProgress( qint64, qint64 ) ),
-        this, SLOT( sl_uploadProgress( qint64, qint64 ) ) );
-
-    QTimer::singleShot(100, this, SLOT(sl_cancelCheck()));
+    runRequest(requestUrl);
     loop->exec( );
 
     if ( !isCanceled( ) ) {
@@ -443,6 +437,16 @@ void LoadDataFromEntrezTask::run( )
     }
 }
 
+void LoadDataFromEntrezTask::runRequest(const QUrl& requestUrl) {
+    downloadReply = networkManager->get(QNetworkRequest(requestUrl));
+    connect(downloadReply, SIGNAL(error(QNetworkReply::NetworkError)),
+        this, SLOT(sl_onError(QNetworkReply::NetworkError)));
+    connect(downloadReply, SIGNAL(uploadProgress(qint64, qint64)),
+        this, SLOT(sl_uploadProgress(qint64, qint64)));
+
+    QTimer::singleShot(100, this, SLOT(sl_cancelCheck()));
+}
+
 void LoadDataFromEntrezTask::sl_cancelCheck() {
     if (isCanceled()) {
         if (loop->isRunning()) {
@@ -460,14 +464,22 @@ void LoadDataFromEntrezTask::sl_replyFinished( QNetworkReply* reply )
         return;
     }
     if ( reply == searchReply ) {
+        QString locationHeaderValue = reply->header(QNetworkRequest::KnownHeaders::LocationHeader).toString();
+        if (!locationHeaderValue.isEmpty()) {
+            QUrl redirectedUrl(reply->url());
+            redirectedUrl.setUrl(reply->attribute(QNetworkRequest::RedirectionTargetAttribute).toString());
+            coreLog.details(tr("Redirecting to %1").arg(redirectedUrl.url()));
+            runRequest(redirectedUrl);
+            return;
+        }
         QXmlInputSource source(reply);
         ESearchResultHandler* handler = new ESearchResultHandler;
         xmlReader.setContentHandler(handler);
         xmlReader.setErrorHandler(handler);
         bool ok = xmlReader.parse(source);
-        if ( !ok ) {
-            assert( false );
-            stateInfo.setError( "Parsing eSearch result failed" );
+        if (!ok) {
+            assert(false);
+            stateInfo.setError("Parsing eSearch result failed");
         }
         delete handler;
     }
@@ -493,10 +505,7 @@ void EntrezQueryTask::run( )
     createLoopAndNetworkManager(query);
 
     QUrl request( query );
-    ioLog.trace( QString( "Sending request: %1" ).arg( query ) );
-    queryReply = networkManager->get( QNetworkRequest( request ) );
-    connect( queryReply, SIGNAL( error( QNetworkReply::NetworkError ) ), this,
-        SLOT( sl_onError( QNetworkReply::NetworkError ) ) );
+    runRequest(request);
 
     loop->exec( );
     if ( !isCanceled( ) ) {
@@ -516,6 +525,14 @@ void EntrezQueryTask::sl_replyFinished( QNetworkReply* reply )
         loop->exit();
         return;
     }
+    QString locationHeaderValue = reply->header(QNetworkRequest::KnownHeaders::LocationHeader).toString();
+    if (!locationHeaderValue.isEmpty()) {
+        QUrl redirectedUrl(reply->url());
+        redirectedUrl.setUrl(reply->attribute(QNetworkRequest::RedirectionTargetAttribute).toString());
+        coreLog.details(tr("Redirecting to %1").arg(redirectedUrl.url()));
+        runRequest(redirectedUrl);
+        return;
+    }
     QXmlInputSource source(reply);
     xmlReader.setContentHandler(resultHandler);
     xmlReader.setErrorHandler(resultHandler);
@@ -524,6 +541,13 @@ void EntrezQueryTask::sl_replyFinished( QNetworkReply* reply )
         stateInfo.setError("Parsing Entrez query result failed");
     }
     loop->exit();
+}
+
+void EntrezQueryTask::runRequest(const QUrl& requestUrl) {
+    ioLog.trace(QString("Sending request: %1").arg(query));
+    queryReply = networkManager->get(QNetworkRequest(requestUrl));
+    connect(queryReply, SIGNAL(error(QNetworkReply::NetworkError)), this,
+        SLOT(sl_onError(QNetworkReply::NetworkError)));
 }
 
 //////////////////////////////////////////////////////////////////////////
