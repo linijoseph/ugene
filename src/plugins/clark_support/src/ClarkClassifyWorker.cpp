@@ -617,7 +617,7 @@ QStringList ClarkClassifyTask::getArguments() {
     if (QString::compare(cfg.tool, ClarkClassifySettings::TOOL_DEFAULT, Qt::CaseInsensitive) == 0) {
         arguments << "-s" << QString::number(cfg.factor);
         arguments << "-k" << QString::number(cfg.kmerSize);
-    } else {
+    } else if (QString::compare(cfg.tool, ClarkClassifySettings::TOOL_LIGHT, Qt::CaseInsensitive) == 0) {
         arguments << "-g" << QString::number(cfg.gap);
     }
 
