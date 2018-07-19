@@ -464,11 +464,10 @@ void LoadDataFromEntrezTask::sl_replyFinished( QNetworkReply* reply )
         return;
     }
     if ( reply == searchReply ) {
-        QString locationHeaderValue = reply->header(QNetworkRequest::KnownHeaders::LocationHeader).toString();
+        QString locationHeaderValue = reply->header(QNetworkRequest::LocationHeader).toString();
         if (!locationHeaderValue.isEmpty()) {
-            QUrl redirectedUrl(reply->url());
-            redirectedUrl.setUrl(reply->attribute(QNetworkRequest::RedirectionTargetAttribute).toString());
-            coreLog.details(tr("Redirecting to %1").arg(redirectedUrl.url()));
+            QUrl redirectedUrl(locationHeaderValue);
+            coreLog.details(tr("Redirecting to %1").arg(locationHeaderValue));
             runRequest(redirectedUrl);
             return;
         }

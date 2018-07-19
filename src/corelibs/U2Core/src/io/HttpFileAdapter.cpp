@@ -324,7 +324,7 @@ void HttpFileAdapter::done()
         QUrl redirectedUrl(locationHeaderValue);
         chunk_list.clear();
         close();
-        coreLog.details(tr("Redirecting to %1").arg(redirectedUrl.url()));
+        coreLog.details(tr("Redirecting to %1").arg(locationHeaderValue));
         open(redirectedUrl, netManager->proxy());
         return;
     }
