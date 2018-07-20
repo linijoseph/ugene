@@ -1,23 +1,23 @@
 /**
- * UGENE - Integrated Bioinformatics Tools.
- * Copyright (C) 2008-2018 UniPro <ugene@unipro.ru>
- * http://ugene.net
- *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
- * MA 02110-1301, USA.
- */
+* UGENE - Integrated Bioinformatics Tools.
+* Copyright (C) 2008-2018 UniPro <ugene@unipro.ru>
+* http://ugene.net
+*
+* This program is free software; you can redistribute it and/or
+* modify it under the terms of the GNU General Public License
+* as published by the Free Software Foundation; either version 2
+* of the License, or (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program; if not, write to the Free Software
+* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+* MA 02110-1301, USA.
+*/
 
 #include <QScopedPointer>
 
@@ -72,10 +72,9 @@ static const QString BASE_SPADES_SUBDIR("spades");
 /* Worker */
 /************************************************************************/
 SpadesWorker::SpadesWorker(Actor *p)
-: BaseWorker(p)
-, inChannel(NULL)
-, output(NULL)
-{
+    : BaseWorker(p)
+    , inChannel(NULL)
+    , output(NULL) {
 
 }
 
@@ -104,21 +103,21 @@ Task *SpadesWorker::tick() {
         read.libType = PAIR_TYPE_DEFAULT;
 
 
-        if(data.contains(READS_PAIRED_URL_SLOT_ID)){
+        if (data.contains(READS_PAIRED_URL_SLOT_ID)) {
             QString readsPairedUrl = data[READS_PAIRED_URL_SLOT_ID].toString();
             read.libType = PAIR_TYPE_DEFAULT;
             read.libName = LIBRARY_PAIRED;
             read.right = readsPairedUrl;
-        }else {
+        } else {
             read.libName = LIBRARY_SINGLE;
         }
-        settings.reads = QList<AssemblyReads>()<<read;
+        settings.reads = QList<AssemblyReads>() << read;
 
         settings.listeners = createLogListeners();
         GenomeAssemblyMultiTask* t = new GenomeAssemblyMultiTask(settings);
         connect(t, SIGNAL(si_stateChanged()), SLOT(sl_taskFinished()));
         return t;
-    }else if (inChannel->isEnded()) {
+    } else if (inChannel->isEnded()) {
         setDone();
         output->setEnded();
     }
@@ -135,18 +134,18 @@ void SpadesWorker::sl_taskFinished() {
         return;
     }
 
-     QString scaffoldUrl = t->getResultUrl();
-     SpadesTask *spadesTask = qobject_cast<SpadesTask*>(t->getAssemblyTask());
-     CHECK(spadesTask != NULL, );
-     QString contigsUrl = spadesTask->getContigsUrl();
+    QString scaffoldUrl = t->getResultUrl();
+    SpadesTask *spadesTask = qobject_cast<SpadesTask*>(t->getAssemblyTask());
+    CHECK(spadesTask != NULL, );
+    QString contigsUrl = spadesTask->getContigsUrl();
 
-     QVariantMap data;
-     data[SCAFFOLD_OUT_SLOT_ID] =  qVariantFromValue<QString>(scaffoldUrl);
-     data[CONTIGS_URL_OUT_SLOT_ID] = qVariantFromValue<QString>(contigsUrl);
-     output->put(Message(output->getBusType(), data));
+    QVariantMap data;
+    data[SCAFFOLD_OUT_SLOT_ID] = qVariantFromValue<QString>(scaffoldUrl);
+    data[CONTIGS_URL_OUT_SLOT_ID] = qVariantFromValue<QString>(contigsUrl);
+    output->put(Message(output->getBusType(), data));
 
-     context->getMonitor()->addOutputFile(scaffoldUrl, getActor()->getId());
-     context->getMonitor()->addOutputFile(contigsUrl, getActor()->getId());
+    context->getMonitor()->addOutputFile(scaffoldUrl, getActor()->getId());
+    context->getMonitor()->addOutputFile(contigsUrl, getActor()->getId());
 
     if (inChannel->isEnded() && !inChannel->hasMessage()) {
         setDone();
@@ -154,7 +153,7 @@ void SpadesWorker::sl_taskFinished() {
     }
 }
 
-GenomeAssemblyTaskSettings SpadesWorker::getSettings( U2OpStatus &os ){
+GenomeAssemblyTaskSettings SpadesWorker::getSettings(U2OpStatus &os) {
     GenomeAssemblyTaskSettings settings;
 
     settings.algName = ET_SPADES;
@@ -165,7 +164,7 @@ GenomeAssemblyTaskSettings SpadesWorker::getSettings( U2OpStatus &os ){
     }
     outDir = GUrlUtils::createDirectory(outDir + "/" + BASE_SPADES_SUBDIR, "_", os);
     CHECK_OP(os, settings);
-    if (outDir.endsWith("/")){
+    if (outDir.endsWith("/")) {
         outDir.chop(1);
     }
 
@@ -187,12 +186,12 @@ GenomeAssemblyTaskSettings SpadesWorker::getSettings( U2OpStatus &os ){
 /* Factory */
 /************************************************************************/
 class SpadesInputSlotsValidator : public PortValidator {
-    public:
+public:
 
     bool validate(const IntegralBusPort *port, ProblemList &problemList) const {
         QVariant busMap = port->getParameter(Workflow::IntegralBusPort::BUS_MAP_ATTR_ID)->getAttributePureValue();
         bool data = isBinded(busMap.value<StrStrMap>(), READS_URL_SLOT_ID);
-        if (!data){
+        if (!data) {
             QString dataName = slotName(port, READS_URL_SLOT_ID);
             problemList.append(Problem(IntegralBusPort::tr("The slot must be not empty: '%1'").arg(dataName)));
             return false;
@@ -207,26 +206,26 @@ class SpadesInputSlotsValidator : public PortValidator {
 
         bool hasCommonElements = false;
 
-        foreach(const IntegralBusSlot& ibsl1, slots1){
-            if (hasCommonElements){
+        foreach(const IntegralBusSlot& ibsl1, slots1) {
+            if (hasCommonElements) {
                 break;
             }
-            foreach(const IntegralBusSlot& ibsl2, slots2){
-                if (ibsl1 == ibsl2){
+            foreach(const IntegralBusSlot& ibsl2, slots2) {
+                if (ibsl1 == ibsl2) {
                     hasCommonElements = true;
                     break;
                 }
             }
         }
 
-        if (hasCommonElements){
+        if (hasCommonElements) {
             problemList.append(Problem(SpadesWorker::tr("SPAdes cannot recognize read pairs from the same file. Please, perform demultiplexing first.")));
             return false;
         }
 
         return true;
     }
-    };
+};
 
 void SpadesWorkerFactory::init() {
     QList<PortDescriptor*> portDescs;
@@ -271,67 +270,79 @@ void SpadesWorkerFactory::init() {
     portDescs << new PortDescriptor(outPortDesc, outTypeSet, false, true);
 
 
-     QList<Attribute*> attrs;
-     {
-         Descriptor outDir(OUTPUT_DIR,
-             SpadesWorker::tr("Output folder"),
-             SpadesWorker::tr("Folder to save Spades output files."));
+    QList<Attribute*> attrs;
+    {
+        Descriptor outDir(OUTPUT_DIR,
+            SpadesWorker::tr("Output folder"),
+            SpadesWorker::tr("Folder to save Spades output files."));
 
-         Descriptor threads(SpadesTask::OPTION_THREADS,
-             SpadesWorker::tr("Number of threads"),
-             SpadesWorker::tr("Number of threads (-t)."));
+        Descriptor threads(SpadesTask::OPTION_THREADS,
+            SpadesWorker::tr("Number of threads"),
+            SpadesWorker::tr("Number of threads (-t)."));
 
-         Descriptor memLim(SpadesTask::OPTION_MEMLIMIT,
-             SpadesWorker::tr("Memory limit (GB)"),
-             SpadesWorker::tr("Memory limit (-m)."));
+        Descriptor memLim(SpadesTask::OPTION_MEMLIMIT,
+            SpadesWorker::tr("Memory limit"),
+            SpadesWorker::tr("Memory limit (-m)."));
 
-         Descriptor datasetType(SpadesTask::OPTION_DATASET_TYPE,
-             SpadesWorker::tr("Dataset type"),
-             SpadesWorker::tr("Input dataset type."));
+        Descriptor datasetType(SpadesTask::OPTION_DATASET_TYPE,
+            SpadesWorker::tr("Dataset type"),
+            SpadesWorker::tr("Select the input dataset type: standard isolate (the default value) or multiple displacement amplification (corresponds to --sc)."));
 
-         Descriptor rMode(SpadesTask::OPTION_RUNNING_MODE,
-             SpadesWorker::tr("Running mode"),
-             SpadesWorker::tr("Running mode."));
+        Descriptor rMode(SpadesTask::OPTION_RUNNING_MODE,
+            SpadesWorker::tr("Running mode"),
+            SpadesWorker::tr("By default, SPAdes performs both read error correction and assembly. You can select leave one of only (corresponds to --only-assembler, --only-error-correction).<br><br>\
+                                                           Error correction is performed using BayesHammer module in case of Illumina input reads and IonHammer in case of IonTorrent data.Note that you should not use error correction\
+                                                                                          in case input reads do not have quality information(e.g.FASTA input files are provided)."));
 
-         Descriptor kMer(SpadesTask::OPTION_K_MER,
-             SpadesWorker::tr("K-mers"),
-             SpadesWorker::tr("k-mer sizes (-k)."));
+        Descriptor kMer(SpadesTask::OPTION_K_MER,
+            SpadesWorker::tr("K-mers"),
+            SpadesWorker::tr("k-mer sizes (-k)."));
 
-        attrs << new Attribute(datasetType, BaseTypes::STRING_TYPE(), true, QVariant("Multi Cell"));
+        attrs << new Attribute(datasetType, BaseTypes::STRING_TYPE(), true, QVariant("Standard isolate"));
         attrs << new Attribute(rMode, BaseTypes::STRING_TYPE(), true, QVariant("Error Correction and Assembly"));
-        attrs << new Attribute(kMer, BaseTypes::STRING_TYPE(), true, QVariant("auto"));
+        attrs << new Attribute(kMer, BaseTypes::STRING_TYPE(), true, QVariant("Auto"));
 
         attrs << new Attribute(threads, BaseTypes::NUM_TYPE(), false, QVariant(16));
         attrs << new Attribute(memLim, BaseTypes::NUM_TYPE(), false, QVariant(250));
         attrs << new Attribute(outDir, BaseTypes::STRING_TYPE(), Attribute::CanBeEmpty | Attribute::Required);
 
-     }
+    }
 
-     QMap<QString, PropertyDelegate*> delegates;
-     {
-         DelegateTags outputUrlTags;
-         outputUrlTags.set(DelegateTags::PLACEHOLDER_TEXT, "Auto");
-         delegates[OUTPUT_DIR] = new URLDelegate(outputUrlTags, "spades/output", false, true);
+    QMap<QString, PropertyDelegate*> delegates;
+    {
+        DelegateTags outputUrlTags;
+        outputUrlTags.set(DelegateTags::PLACEHOLDER_TEXT, "Auto");
+        delegates[OUTPUT_DIR] = new URLDelegate(outputUrlTags, "spades/output", false, true);
 
-         QVariantMap spinMap; spinMap["minimum"] = QVariant(1); spinMap["maximum"] = QVariant(INT_MAX);
-         delegates[SpadesTask::OPTION_THREADS]  = new SpinBoxDelegate(spinMap);
-         delegates[SpadesTask::OPTION_MEMLIMIT]  = new SpinBoxDelegate(spinMap);
+        QVariantMap spinMapThreads;
+        spinMapThreads["minimum"] = QVariant(1);
+        spinMapThreads["maximum"] = QVariant(INT_MAX);
 
-         QVariantMap contentMap;
-         contentMap["Multi Cell"] = "Multi Cell";
-         contentMap["Single Cell"] = "Single Cell";
-         delegates[SpadesTask::OPTION_DATASET_TYPE] = new ComboBoxDelegate(contentMap);
+        QVariantMap spinMapMemory(spinMapThreads);
+        spinMapMemory["suffix"] = SpadesWorker::tr(" Gb");
 
-         QVariantMap contentMap2;
-         contentMap2["Error Correction and Assembly"] = "Error Correction and Assembly";
-         contentMap2["Assembly only"] = "Assembly only";
-         contentMap2["Error correction only"] = "Error correction only";
-         delegates[SpadesTask::OPTION_RUNNING_MODE] = new ComboBoxDelegate(contentMap2);
+        delegates[SpadesTask::OPTION_THREADS] = new SpinBoxDelegate(spinMapThreads);
+        delegates[SpadesTask::OPTION_MEMLIMIT] = new SpinBoxDelegate(spinMapMemory);
+
+        QVariantMap contentMap;
+        contentMap["Standard isolate"] = "Standard isolate";
+        contentMap["MDA single-cell"] = "MDA single-cell";
+        delegates[SpadesTask::OPTION_DATASET_TYPE] = new ComboBoxDelegate(contentMap);
+
+        QVariantMap contentMap2;
+        contentMap2["Error correction and assembly"] = "Error correction and assembly";
+        contentMap2["Assembly only"] = "Assembly only";
+        contentMap2["Error correction only"] = "Error correction only";
+        delegates[SpadesTask::OPTION_RUNNING_MODE] = new ComboBoxDelegate(contentMap2);
     }
 
     Descriptor protoDesc(SpadesWorkerFactory::ACTOR_ID,
         SpadesWorker::tr("Assemble Reads with SPAdes"),
-        SpadesWorker::tr("Performes assembly of input short reads."));
+        SpadesWorker::tr("In general, SPAdes (St. Petersburg genome assembler) is an assembly toolkit containing various assembly pipelines.\
+                                                   This workflow element provides GUI for the main SPAdes executable script. One can specify Illumina, IonTorrent or \
+                                                                            PacBio reads as input. Hybrid assemblies are also possible, for example, with Oxford Nanopore or Sanger reads.<br><br>\
+                                                                                                     To use the element, configure the type of input in the \"Input data\" parameter.The corresponding input ports will appear \
+                                                                                                                              on the element.Provide URL(s) to the corresponding FASTA or FASTQ file(s) to these ports."));
 
     ActorPrototype *proto = new IntegralBusActorPrototype(protoDesc, portDescs, attrs);
     proto->setPrompter(new SpadesPrompter());
@@ -347,16 +358,7 @@ Worker *SpadesWorkerFactory::createWorker(Actor *a) {
 }
 
 QString SpadesPrompter::composeRichDoc() {
-    QString res = "";
-
-    Actor* readsProducer = qobject_cast<IntegralBusPort*>(target->getPort(IN_PORT_DESCR))->getProducer(READS_URL_SLOT_ID);
-
-    QString unsetStr = "<font color='red'>"+tr("unset")+"</font>";
-    QString readsUrl = readsProducer ? readsProducer->getLabel() : unsetStr;
-
-    res.append(tr("Assemble reads from <u>%1</u>.").arg(readsUrl));
-
-    return res;
+    return tr("Assemble de novo the input data into contigs and scaffolds.");
 }
 
 } // LocalWorkflow
