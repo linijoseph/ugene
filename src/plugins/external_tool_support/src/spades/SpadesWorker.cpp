@@ -291,8 +291,8 @@ void SpadesWorkerFactory::init() {
         Descriptor rMode(SpadesTask::OPTION_RUNNING_MODE,
             SpadesWorker::tr("Running mode"),
             SpadesWorker::tr("By default, SPAdes performs both read error correction and assembly. You can select leave one of only (corresponds to --only-assembler, --only-error-correction).<br><br>\
-                                                           Error correction is performed using BayesHammer module in case of Illumina input reads and IonHammer in case of IonTorrent data.Note that you should not use error correction\
-                                                                                          in case input reads do not have quality information(e.g.FASTA input files are provided)."));
+                              Error correction is performed using BayesHammer module in case of Illumina input reads and IonHammer in case of IonTorrent data.Note that you should not use error correction \
+                              in case input reads do not have quality information(e.g.FASTA input files are provided)."));
 
         Descriptor kMer(SpadesTask::OPTION_K_MER,
             SpadesWorker::tr("K-mers"),
@@ -339,10 +339,10 @@ void SpadesWorkerFactory::init() {
     Descriptor protoDesc(SpadesWorkerFactory::ACTOR_ID,
         SpadesWorker::tr("Assemble Reads with SPAdes"),
         SpadesWorker::tr("In general, SPAdes (St. Petersburg genome assembler) is an assembly toolkit containing various assembly pipelines.\
-                                                   This workflow element provides GUI for the main SPAdes executable script. One can specify Illumina, IonTorrent or \
-                                                                            PacBio reads as input. Hybrid assemblies are also possible, for example, with Oxford Nanopore or Sanger reads.<br><br>\
-                                                                                                     To use the element, configure the type of input in the \"Input data\" parameter.The corresponding input ports will appear \
-                                                                                                                              on the element.Provide URL(s) to the corresponding FASTA or FASTQ file(s) to these ports."));
+                          This workflow element provides GUI for the main SPAdes executable script. One can specify Illumina, IonTorrent or \
+                          PacBio reads as input. Hybrid assemblies are also possible, for example, with Oxford Nanopore or Sanger reads.<br><br>\
+                          To use the element, configure the type of input in the \"Input data\" parameter.The corresponding input ports will appear \
+                          on the element.Provide URL(s) to the corresponding FASTA or FASTQ file(s) to these ports."));
 
     ActorPrototype *proto = new IntegralBusActorPrototype(protoDesc, portDescs, attrs);
     proto->setPrompter(new SpadesPrompter());
